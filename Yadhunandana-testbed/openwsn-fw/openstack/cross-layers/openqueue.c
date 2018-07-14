@@ -91,10 +91,102 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer(uint8_t creator) {
          return &openqueue_vars.queue[i];
       }
    }
+    
+    openqueue_sortpriority();
+    openserial_printf("A",2,'D');
+    
    ENABLE_INTERRUPTS();
    return NULL;
 }
 
+void openqueue_sortpriority(){
+    uint8_t i, j, k, c, a, temp;
+    INTERRUPT_DECLARATION();
+    DISABLE_INTERRUPTS();
+    
+    //    openserial_printf("A",2,'D');
+    
+    for (i = 1; i < QUEUELENGTH; i++){
+        c = i;
+        do{
+            a = (c - 1) / 2;
+            if (openqueue_vars.queue[a].priority < openqueue_vars.queue[c].priority){
+                temp = openqueue_vars.queue[a].priority;
+                openqueue_vars.queue[a].priority = openqueue_vars.queue[c].priority;
+                openqueue_vars.queue[c].priority = temp;
+            }
+            c = a;
+        } while (c != 0);
+    }
+    
+    for (k = 0; k < QUEUELENGTH; k++)
+    {
+        j= QUEUELENGTH-1-k;
+        temp = openqueue_vars.queue[0].priority;
+        openqueue_vars.queue[0].priority = openqueue_vars.queue[j].priority;    /* swap max element with rightmost leaf element */
+        openqueue_vars.queue[j].priority = temp;
+        a = 0;
+        do
+        {
+            c = 2 * a + 1;    /* left node of root element */
+            if ((openqueue_vars.queue[c].priority < openqueue_vars.queue[c + 1].priority) && c < j-1)
+                c++;
+            if (openqueue_vars.queue[a].priority<openqueue_vars.queue[c].priority && c<j)    /* again rearrange to max heap array */
+            {
+                temp = openqueue_vars.queue[a].priority;
+                openqueue_vars.queue[a].priority = openqueue_vars.queue[c].priority;
+                openqueue_vars.queue[c].priority = temp;
+            }
+            a = c;
+        } while (c < j);
+        //openserial_printf("A",2,'D');
+    }
+    ENABLE_INTERRUPTS();
+    //    return NULL;
+}
+//from here the heap sort is complete, the queue is ordered from the smallest number to the highest
+// 1st priority = 1 , 2nd priority = 2 , ...and so on
+//after the first for it is not correctly sorted from high-to-low or low-to-high
+//after the second for, the sorting is complete from low-to-high
+
+// I wrote the code for sorting inside openqueue_macGetDataPacket so that the functions wouldn't get messed up
+// and I wouldn't disrupt the actions in other files, the sorting will immediately be summoned when the function
+// openqueue_macGetDataPacket is used
+
+// uint8_t openserial_printf(char *ch,uint8_t data_len,uint8_t type); as given in openserial.h
+
+OpenQueueEntry_t* openqueue_getFreePacketBuffer_withpriority(uint8_t creator, uint8_t priority ) {
+    uint8_t i;
+    INTERRUPT_DECLARATION();
+    DISABLE_INTERRUPTS();
+    
+    // refuse to allocate if we're not in sync
+    if (ieee154e_isSynch()==FALSE && creator > COMPONENT_IEEE802154E){
+        ENABLE_INTERRUPTS();
+        return NULL;
+    }
+    
+    // if you get here, I will try to allocate a buffer for you
+    
+    // if there is no space left for high priority queue, don't reserve
+    if (openqueue_isHighPriorityEntryEnough()==FALSE && creator>COMPONENT_SIXTOP_RES){
+        ENABLE_INTERRUPTS();
+        return NULL;
+    }
+    
+    // walk through queue and find free entry
+    for (i=0;i<QUEUELENGTH;i++) {
+        if (openqueue_vars.queue[i].owner==COMPONENT_NULL) {
+            openqueue_vars.queue[i].creator=creator;
+            openqueue_vars.queue[i].owner=COMPONENT_OPENQUEUE;
+            openqueue_vars.queue[i].priority=priority;
+            ENABLE_INTERRUPTS();
+            return &openqueue_vars.queue[i];
+        }
+    }
+    ENABLE_INTERRUPTS();
+    return NULL;
+}
 
 /**
 \brief Free a previously-allocated packet buffer.

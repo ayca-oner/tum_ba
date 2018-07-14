@@ -318,6 +318,7 @@ typedef struct {
    //admin
    uint8_t       creator;                                       // the component which called getFreePacketBuffer()
    uint8_t       owner;                                         // the component which currently owns the entry
+   uint8_t       priority;                                      // !!newly added!! priority of the packet
    uint8_t*      payload;                                       // pointer to the start of the payload within 'packet'
    uint8_t       length;                                        // length in bytes of the payload
    //l7
