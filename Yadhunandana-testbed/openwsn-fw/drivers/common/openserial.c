@@ -204,7 +204,7 @@ void openserial_startOutput() {
         if(isPacket)
         {
             uint16_t ticks = opentimers_measure_ticks(0,1);
-            openserial_printf(&ticks,2,'D');
+            openserial_printf(&ticks,2,'D'); // -ayca inject'te burdan output->debug msg
             isPacket = FALSE;
         }
         uart_writeByte(data);

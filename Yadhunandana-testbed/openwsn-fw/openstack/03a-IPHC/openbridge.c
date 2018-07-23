@@ -52,7 +52,7 @@ void openbridge_triggerData() {
       //openqueue_freePacketBuffer(pkt);
       //return;
       //Yadhu added ends
-
+      openserial_printf("1847",strlen("1223"),'A'); // -inject bunu yapmıyor
       //admin
       pkt->creator  = COMPONENT_OPENBRIDGE;
       pkt->owner    = COMPONENT_OPENBRIDGE;
@@ -101,7 +101,7 @@ void openbridge_receive(OpenQueueEntry_t* msg) {
    //memcpy(msg->payload,idmanager_getMyID(ADDR_64B)->addr_64b,LENGTH_ADDR64b);
    
    // send packet over serial (will be memcopied into serial buffer)
-   openserial_printf((uint8_t*)(msg->payload),msg->length,'P');
+   openserial_printf((uint8_t*)(msg->payload),msg->length,'P'); //ayca - inject'te burdan output
    //leds_error_toggle();
    //openserial_printf("\r\n",2);
    

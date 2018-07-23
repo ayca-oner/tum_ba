@@ -93,7 +93,7 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer(uint8_t creator) {
    }
     
     openqueue_sortpriority();
-    openserial_printf("A",2,'D');
+    openserial_printf("1",1,'A');
     
    ENABLE_INTERRUPTS();
    return NULL;
@@ -103,8 +103,6 @@ void openqueue_sortpriority(){
     uint8_t i, j, k, c, a, temp;
     INTERRUPT_DECLARATION();
     DISABLE_INTERRUPTS();
-    
-    //    openserial_printf("A",2,'D');
     
     for (i = 1; i < QUEUELENGTH; i++){
         c = i;
@@ -139,7 +137,6 @@ void openqueue_sortpriority(){
             }
             a = c;
         } while (c < j);
-        //openserial_printf("A",2,'D');
     }
     ENABLE_INTERRUPTS();
     //    return NULL;
@@ -213,6 +210,10 @@ owerror_t openqueue_freePacketBuffer(OpenQueueEntry_t* pkt) {
          return E_SUCCESS;
       }
    }
+
+   openserial_printf("23",strlen("23"),'A'); // -root bunu yapmıyor
+
+
    // log the error
    openserial_printCritical(COMPONENT_OPENQUEUE,ERR_FREEING_ERROR,
                          (errorparameter_t)0,
@@ -235,8 +236,12 @@ void openqueue_removeAllCreatedBy(uint8_t creator) {
          openqueue_reset_entry(&(openqueue_vars.queue[i]));
       }
    }
+   //openserial_printf("1847",strlen("1847"),'A'); 
+   // root'ta degil python acilinca sonsuz tekrarlanıyor
+
    ENABLE_INTERRUPTS();
 }
+
 
 /**
 \brief Free all the packet buffers owned by a specific module.
@@ -252,6 +257,7 @@ void openqueue_removeAllOwnedBy(uint8_t owner) {
          openqueue_reset_entry(&(openqueue_vars.queue[i]));
       }
    }
+    //openserial_printf("1234",strlen("1223"),'A'); // root'ta yok
    ENABLE_INTERRUPTS();
 }
 
@@ -268,6 +274,7 @@ OpenQueueEntry_t* openqueue_sixtopGetSentPacket() {
          return &openqueue_vars.queue[i];
       }
    }
+   openserial_printf("89",strlen("89"),'A'); // root'ta yok
    ENABLE_INTERRUPTS();
    return NULL;
 }

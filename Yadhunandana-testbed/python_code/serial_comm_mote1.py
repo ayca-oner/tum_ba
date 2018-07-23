@@ -1,22 +1,23 @@
-#This python script reads the packets from the serial port, builds the routing table based on them.
+#A python script to communicate with 
+# the mote.
 
-import socket
 import serial
 import threading
 import binascii
 import sys
 import time
-from ParserData import ParserData
-from Routing import Routing
-from UDPPacket import UDPPacket
+import socket
+import struct
 import json
-import os
 
 
-#This command includes the prefix and the security key of the 802.15.4 network
+
+#This commnd includes the prefix and the security key of the 802.15.4 network
 command_set_dagroot = bytearray([0x7e,0x1c,0x43,0x00,0x54,0xbb,0xbb,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x91,0x5b,0xc9,0xf1,0x5c,0x77,0x57,0x89,0x4f,0x4f,0x86,0x15,0xd8,0x14,0x25,0x27])
 
-command_get_node_type = bytearray([0x7e,0x03,0x43,0x01])
+command_get_neighbor_count = bytearray([0x7e,0x03,0x43,0x01])
+
+command_get_neighbors = bytearray([0x7e,0x03,0x43,0x02])
 
 command_set_measurement = bytearray([0x7e,0x03,0x43,0x0b])
 
@@ -24,9 +25,7 @@ command_reset_measurement = bytearray([0x7e,0x03,0x43,0x0a])
 
 command_get_measresult = bytearray([0x7e,0x03,0x43,0x09])
 
-command_get_neighbor_count = bytearray([0x7e,0x03,0x43,0x02])
-
-command_get_neighbors = bytearray([0x7e,0x03,0x43,0x03])
+command_inject_udp_packet = bytearray([0x7e,0x03,0x44,0x00])
 
 command_get_schedule = bytearray([0x7e,0x03,0x43,0x04])
 
@@ -36,59 +35,45 @@ command_add_rx_slot = bytearray([0x7e,0x03,0x43,0x06])
 
 command_reset_board = bytearray([0x7e,0x03,0x43,0x08])
 
-command_inject_udp_packet = bytearray([0x7e,0x03,0x44,0x00])
+command_get_buff_stat = bytearray([0x7e,0x03,0x43,0xff])
 
-ping_packet = bytearray([0x14,0x15,0x92,0x0,0x0,0x0,0x0,0x2,0xf1,0x7a,0x55,0x3a,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x14,0x15,0x92,0x0,0x0,0x0,0x0,0x2,
-0x80,0x0,0x47,0x85,0x5,0xa8,0x0,0xd,0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9])
-
-
-#I have to convert this ipv6 packet to 6LowPAN packet
-ipv6_ping_packet  = [0x60,0x9,0xbe,0x7b,0x0,0x12,0x3a,0x40,0xbb,0xbb,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0xbb,0xbb,0x0,0x0,0x0,0x0,0x0,0x0,0x14,0x15,0x92,0x0,0x0,0x0,0x0,0x2,
-0x80,0x0,0x3b,0x3d,0xb,0x9d,0x6,0x60,0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9]
-
-ipv6_udp_packet =   [0x60,0xe,0x30,0x93,0x0,0xb,0x11,0x40,0xbb,0xbb,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0xbb,0xbb,0x0,0x0,0x0,0x0,0x0,0x0,0x14,0x15,0x92,0x0,0x0,0x0,0x0,0x2,
-0xa7,0x64,0xf0,0xb2,0x0,0xb,0xe8,0x34,0x31,0x30,0x30]
-
-lowpan_udp_packet = [0xf1,0x7a,0x55,0x11,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x14,0x15,0x92,0x0,0x0,0x0,0x0,0x2,0xd5,0x9c,0xf0,0xb2,0x0,0xb,0xba,0xc8,0x31,0x30,0x30,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
-0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02]
+command_get_neighbors = bytearray([0x7e,0x03,0x43,0x03])
 
 command_test = bytearray([
-#0xff,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
-#0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
-#0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
-#0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
-#0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
-#0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
-#0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
-#0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
+0xff,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
+0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
+0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
+0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
+0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,
+0x02,0x02,0x02,0x02,0x02,0x02,0x02,#0x02,0x02,0x02,
 0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0x02,0xee
 ])
 
+#this is just a temporary hardcoded data, has to be read from
+#sockets later
+udp_packet_data = "200"
+PAYLOAD_LEN = 77
 
-outputBufLock   = False
+outputBufLock = False
 
-outputBuf       = []
+seperation = 0
 
-isDAGRoot       = False
+outputBuf     = []
 
-RoutingInstanceLock    = False
+measured_data = {}
+#measured_data = []
 
-seperation=0
+payload_length = PAYLOAD_LEN
 
-latency = 0.0
-measured_data = []
+H2R_PACKET_FORMAT = 'f'
+H2R_PACKET_SIZE = struct.calcsize(H2R_PACKET_FORMAT)
 
-#Resetting the measurement files- added by Nico
-if os.path.exists("measurementNicoEnhancedDAGroot.txt"):
-    os.remove("measurementNicoEnhancedDAGroot.txt")
-if os.path.exists("measurementNicoEnhancedMote.txt"):
-    os.remove("measurementNicoEnhancedMote.txt")
-
+#Beginning of moteProbe Class definition
 
 #Beginning of moteProbe Class definition
 
 class moteProbe(threading.Thread):
-    
+
     def __init__(self,serialport=None):
 
         # store params
@@ -105,14 +90,10 @@ class moteProbe(threading.Thread):
         self.latency             = [0.0,0.0] #Here first element represents prev_latency, and second element represents sample count used to calculate the average latency 
         self.prev_pkt            = None
         self.rframe_latency      = 0
-        
+        self.data_pkt_size       = 0 
 
         # flag to permit exit from read loop
         self.goOn                 = True
-        
-        self.parser_data = ParserData()
-        
-        self.routing_instance = Routing()
 
         # initialize the parent class
         threading.Thread.__init__(self)
@@ -129,10 +110,8 @@ class moteProbe(threading.Thread):
         self.start()
         print "serial thread: "+self.name+" started successfully"
         #======================== thread ==========================================
-    
     def run(self):
         while self.goOn: # read bytes from serial port
-
             try:
                 self.rxByte = self.serial.read(1)
                 if not self.rxByte:
@@ -144,6 +123,7 @@ class moteProbe(threading.Thread):
                     continue
             except Exception as err:
                 print err
+                #time.sleep(0.1)
                 break
             else:
                 if self.busyReceiving and (int(binascii.hexlify(self.prevByte),16) == 0x7e):
@@ -152,49 +132,52 @@ class moteProbe(threading.Thread):
                     self.inputBuf           += self.rxByte
                     self.prevByte   = self.rxByte
                     continue
-                else:
+                elif self.busyReceiving:
                     self.inputBuf           += self.rxByte
-                    if len(self.inputBuf) >= self.framelength:
+                    if len(self.inputBuf) == self.framelength:
                         self.busyReceiving = False
                         self._process_inputbuf()
+                else:
+                    #Do not accumulate bytes if they don't belong to defined packet format
+                    continue
+
     def _process_inputbuf(self):
         if self.inputBuf[1].upper() == 'P':
-            print "received packet: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf)
-            data = [int(binascii.hexlify(x),16) for x in self.inputBuf]
-            data_tuple = self.parser_data.parseInput(data[2:])
-            (result,data) = self.routing_instance.meshToLbr_notify(data_tuple)
-            #Added by Nico for error handling
-            if data == None and not result:
+            curr_packet_time = int(round(time.time() * 1000))
+            print "Payload len: "+ str(len(self.inputBuf[2:]))
+            print "received packet: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:]) + " Packet Latency: " + str(curr_packet_time-self.prev_packet_time)
+            #print int(data[4]-0x30)
+            if self.prev_pkt  == self.inputBuf[2:]:
+                print "Duplicate packet"
                 self.inputBuf = ''
-                print "No correct packet!"
                 return
-            if not result:
-                if self.prev_pkt  == data[4:]:
-                    print "Duplicate packet"
-                    self.inputBuf = ''
-                    return
-                curr_packet_time = int(round(time.time() * 1000))
-                print "received data: "+':'.join(str(hex(i)) for i in data[4:])+" , Packet Latency: "+str(curr_packet_time-self.prev_packet_time)
-                print "received data len : "+str(len(data[4:]))
+            x = curr_packet_time - self.prev_packet_time
+            self.latency[1] = self.latency[1] + 1.0
+            if self.latency[1] > 1.0:
                 x = curr_packet_time - self.prev_packet_time
-                self.latency[1] = self.latency[1] + 1.0
-                if self.latency[1] > 1.0:
-                    x = curr_packet_time - self.prev_packet_time
-                    self.running_mean(x)
-                    print "average latency: "+ str(self.latency[0])
-                self.prev_packet_time = curr_packet_time
-                self.prev_pkt = data[4:]
+                self.running_mean(x)
+                print "average latency: "+ str(self.latency[0])
+            self.prev_packet_time = curr_packet_time
+            self.prev_pkt = self.inputBuf[2:]
         elif self.inputBuf[1] == 'D':
             print "debug msg: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:])
-            measured_data.append(int(binascii.hexlify(self.inputBuf[2]),16))
-            #if(len(measured_data[str(payload_length)]) == 50):
-            #if(len(measured_data) == 50):
-                #print(json.dumps(measured_data))
-                #f = open('measurement_radio_rcv_to_nxt_slot_127.json','w')
-                #f.write(json.dumps(measured_data))
-                #f.close()
-                #payload_length = -1
-                #self.close()
+            global measured_data
+            global payload_length
+            if str(payload_length) in measured_data.keys():
+                measured_data[str(payload_length)].append(int(binascii.hexlify(self.inputBuf[2]),16))
+            else:
+                measured_data[str(payload_length)] = [int(binascii.hexlify(self.inputBuf[2]),16)]
+            if(len(measured_data[str(payload_length)]) == 10):
+                if(payload_length == PAYLOAD_LEN):
+                    print(json.dumps(measured_data))
+                    f = open('measurement_udp_data_77.json','w')
+                    f.write(json.dumps(measured_data))
+                    f.close()
+                    payload_length = -1
+                    self.close()
+                else:
+                    payload_length = payload_length + 1
+
 
 	elif self.inputBuf[1] == 'A':
             print "output message: "+":".join("{:02x}".format(ord(c)-48) for c in self.inputBuf[2:])
@@ -233,39 +216,36 @@ class moteProbe(threading.Thread):
                     file.close
                     seperation=2
                 elif seperation == 2:
-                    file = open("measurementNicoOffsets.txt","w")
-                    file.write(responseArrayCheck[4:])
-                    file.close
-                    seperation=3
-                elif seperation == 3:
                    print "Times sent in INIT or RESOLUTION slots: ",responseArrayCheck[4:6],"Times sent in RESOLUTION slots: ",responseArrayCheck[6:8] 
                    seperation=0
-            elif responseArrayCheck[2:4] == "45":
-                file = open("measurementNicoEnhancedDAGroot.txt","a")
-                file.write(responseArrayCheck[4:])
-                file.write("\n")
-                file.close
+            elif responseArrayCheck[2:4] == "44":
+                    file = open("measurementNicoEnhancedMote.txt","a")
+                    file.write(responseArrayCheck[4:])
+                    file.write("\n")
+                    file.close
+
         elif self.inputBuf[1] == 'E':
-            print "------------------------------------------------------------------------"
-            print "error msg: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:])
-            print "------------------------------------------------------------------------"
+            if (int(binascii.hexlify(self.inputBuf[3]),16) == 0x09): #\
+                #or (int(binascii.hexlify(self.inputBuf[3]),16) == 0x1c) :
+                    print "error msg: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:])
+            else:
+                print "------------------------------------------------------------------------"
+                print "error msg: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:])
+                print "------------------------------------------------------------------------"
         elif self.inputBuf[1] == 'S':
             #Sending commands to mote
             #Here I am using global variables
-            #curr_packet_time = int(round(time.time() * 1000))
+            curr_packet_time = int(round(time.time() * 1000))
             #print "request frame: " + str(curr_packet_time-self.rframe_latency)
-            #self.rframe_latency  =  curr_packet_time
+            self.rframe_latency  =  curr_packet_time
             global outputBuf
             global outputBufLock
-            #global latency
             if (len(outputBuf) > 0) and not outputBufLock:
                 outputBufLock = True
                 dataToWrite = outputBuf.pop(0)
                 outputBufLock = False
-                #print int(round(time.time() * 1000)) - latency
-                self.serial.write(dataToWrite)
-                #print len(dataToWrite)
                 print "injecting: "+":".join("{:02x}".format(ord(c)) for c in dataToWrite)
+                self.serial.write(dataToWrite)
         self.inputBuf = ''
 
     def _process_packet(self,packet):
@@ -277,11 +257,11 @@ class moteProbe(threading.Thread):
 
     def close(self):
         self.goOn = False
-
+        
     def prepare_UDP_packet(self,payload):
         print "prepare_UDP_packet"
 
-        #Running mean implementation by storing only one element, and sample count
+    #Running mean implementation by storing only one element, and sample count
     def running_mean(self,x):
         #I have used 300 to make sure that first outlier is rejected, while calculating the average
         tmp = self.latency[0] * max(self.latency[1]-1,1) + x
@@ -293,12 +273,14 @@ class moteProbe(threading.Thread):
 #Thread which continuosly receives data from UDP socket and writes into output buffer
 class SocketThread(threading.Thread):
     
-    def __init__(self,port_number=5005,host="127.0.0.1"):
+    def __init__(self,port_number=8889,host="127.0.0.1"):
         
         self.goOn                 = True
 
         self.UDP_IP = host
         self.UDP_PORT = port_number
+        
+        
         # initialize the parent class, This is equivalent to calling the constructor of the parent class
         threading.Thread.__init__(self)
         
@@ -316,39 +298,28 @@ class SocketThread(threading.Thread):
                 #self.socket_handler.sendto("Hello World",(self.UDP_IP,self.UDP_PORT))
                 # buffer size is 1024 bytes
                 try:
-                    data, addr = self.socket_handler.recvfrom(1024)
-                    global isDAOReceived
-                    if(isDAOReceived):
-                        self.inject_data(data)
-                except:
+                    a = 200
+                    #packed_a = struct.pack('f',a)
+                    #data, addr = self.socket_handler.recvfrom(1024)
+                    #float_data = struct.unpack(H2R_PACKET_FORMAT, data)
+                    #print ("Control command received: %f" % a)
+                    print "sending: "+"yadhu"
+                    global outputBuf
+                    global outputBufLock
+                    outputBufLock = True
+                    command_inject_udp_packet[1] = len(command_inject_udp_packet) + len("yadhu")-1;
+                    outputBuf += command_inject_udp_packet+"yadhu";
+                    outputBufLock  = False
+                    time.sleep(0.1)
+                except socket.timeout:
                     print "timeout exception"
                     continue
         except KeyboardInterrupt:
             self.close()
     
-    def inject_data(self,data):
-            
-            global outputBuf
-            global outputBufLock 
-            sys.stdout.flush()
-            test2                = UDPPacket()
-            test2.setData("Yadhunandana")
-            tmp2 = test2.getPacket()
-            lowpan_packet2 = self.modeprobeobject.routing_instance.convert_to_iphc(tmp2)
-            str_lowpanbytes2 = ''.join(chr(i) for i in lowpan_packet[0]+lowpan_packet[1])
-            str_lowpanbytes2 = bytearray(str_lowpanbytes2)
-            
-            print ':'.join('{:02x}'.format(x) for x in str_lowpanbytes2)
-            
-            outputBufLock = True
-            command_inject_udp_packet[1] = len(command_inject_udp_packet) + len(str_lowpanbytes2)-1; #Here subtracting one because 0x7e is not included in the length
-            outputBuf += command_inject_udp_packet+str_lowpanbytes2;
-            outputBufLock  = False
-    
     #This function is used for stopping this thread from the main thread
     def close(self):
         self.goOn = False
-        
 
 SendPacketMode = False
 
@@ -362,32 +333,26 @@ def checkSumCalc(pkt):
     #print "checksum: "+':'.join('{:02x}'.format(x) for x in result)
     return bytearray(result)
 
-
 if __name__=="__main__":
-    moteProbe_object    = moteProbe('/dev/ttyUSB0')
-    test                = UDPPacket() 
-    #socketThread_object = SocketThread()
-    
-    UDP_IP = "127.0.0.1"
-    UDP_PORT = 5005
-    
-    socket_handler = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-    socket_handler.bind((UDP_IP, UDP_PORT))
-    #Setting timeout as five seconds
-    socket_handler.settimeout(15)
-    
-    print "Interactive mode. Commands:"
-    print "  root to make mote DAGroot"
-    print "  inject to inject packet"
+    moteProbe_object    = moteProbe('/dev/ttyUSB1')
     print "  ipv6 to inject one packet"
     print "  sch to get mote schedule"
     print "  tx to add tx slot"
     print "  rx to add rx slot"
+    print "  neighbors to show neighbors"
     print "  reset to reset the board"
     print "  meas to toggle measurement mode"
     print "  measreset to reset measurement"
     print "  measresult to get measurement result"
     print "  quit to exit "
+    
+    #UDP_IP = "127.0.0.1"
+    #UDP_PORT = 5006
+    
+    #socket_handler = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    #socket_handler.bind((UDP_IP, UDP_PORT))
+    #Setting timeout as five seconds
+    #socket_handler.settimeout(15)
     
     try:
         while(1):
@@ -408,15 +373,7 @@ if __name__=="__main__":
                 SendPacketMode = True
             elif cmd == "ipv6":
                 print "injecting one packet udp packet by converting lowpan packet"
-                sys.stdout.flush()
-                print len(command_test)
-                test.setData(command_test)
-                tmp = test.getPacket()
-                lowpan_packet = moteProbe_object.routing_instance.convert_to_iphc(tmp)
-                if lowpan_packet is None:
-                    print "Unable to inject packet"
-                    continue
-                str_lowpanbytes = ''.join(chr(i) for i in lowpan_packet[0]+lowpan_packet[1])
+                str_lowpanbytes = str(command_test)
                 #Here subtracting one because 0x7e is not included in the length, Adding to two to include checksum bytes.
                 command_inject_udp_packet[1] = len(command_inject_udp_packet) + len(str_lowpanbytes)-1 + 2;
                 #Here I will calculate 16-bit checksum for the whole packet then, I will attach it to end of the packet.
@@ -457,6 +414,20 @@ if __name__=="__main__":
                 outputBufLock = True
                 outputBuf += [str(command_reset_board + chsum)];
                 outputBufLock  = False
+            elif cmd == "test":
+                print "sending test command"
+                if not outputBufLock:
+                    outputBufLock = True
+                    outputBuf += [str(command_test)]
+                    outputBufLock  = False
+            elif cmd == "neighbors":
+                print "sending reset command"
+                sys.stdout.flush()
+                command_get_neighbors[1] = len(command_reset_board)-1 + 2 #excluding 0x7e and including 2 byte checksum in the len
+                chsum = checkSumCalc(command_get_neighbors[1:]) #Excluding 0x7e for checksum calculation
+                outputBufLock = True
+                outputBuf += [str(command_get_neighbors + chsum)];
+                outputBufLock  = False
             elif cmd == "meas":
                 print "sending toggle measurement command"
                 sys.stdout.flush()
@@ -481,44 +452,32 @@ if __name__=="__main__":
                 outputBufLock = True
                 outputBuf += [str(command_get_measresult + chsum)];
                 outputBufLock  = False
-                time.sleep(0.1)
             elif cmd == "quit":
                 print "exiting"
                 break;
             else:
                 print "unknown command"
             while(SendPacketMode):
-                    #try:
-                        #data, addr = socket_handler.recvfrom(3)
-                    #except socket.timeout:
-                        #print "timeout exception"
-                        #continue
-                    #except KeyboardInterrupt:
-                        #moteProbe_object.close()
-                        #exit()
-                    millis = int(round(time.time() * 1000))
-                    sys.stdout.flush()
-                    test.setData(command_test)
-                    print len(command_test)
-                    tmp = test.getPacket()
-                    #print "ipv6: "+':'.join(hex(i) for i in tmp)
-                    lowpan_packet = moteProbe_object.routing_instance.convert_to_iphc(tmp)
-                    if lowpan_packet is None:
-                        #This happens when we don't have a route to the mote
-                        print "Unable to inject packet"
-                        time.sleep(0.1)
-                        continue
-                    #str_lowpanbytes = lowpan_udp_packet
-                    str_lowpanbytes = ''.join(chr(i) for i in lowpan_packet[0]+lowpan_packet[1])
-                    #Here subtracting one because 0x7e is not included in the length, Adding to two to include checksum bytes.
-                    command_inject_udp_packet[1] = len(command_inject_udp_packet) + len(str_lowpanbytes)-1 + 2;
-                    #Here I will calculate 16-bit checksum for the whole packet then, I will attach it to end of the packet.
-                    chsum = checkSumCalc(bytearray(str(command_inject_udp_packet[1:])+str_lowpanbytes))
-                    if not outputBufLock:
-                        outputBufLock = True
-                        outputBuf += [str(command_inject_udp_packet)+str_lowpanbytes+str(chsum)]
-                        outputBufLock  = False
-                    time.sleep(0.1)
+                #try:
+                    #a, addr = socket_handler.recvfrom(1024)
+                #except socket.timeout:
+                    #print "timeout exception"
+                    #continue
+                #except KeyboardInterrupt:
+                    #moteProbe_object.close()
+                    #exit()
+                #if payload_length == -1:
+                    #exit()
+                str_lowpanbytes = str(command_test)
+                #Here subtracting one because 0x7e is not included in the length, Adding to two to include checksum bytes.
+                command_inject_udp_packet[1] = len(command_inject_udp_packet) + len(str_lowpanbytes)-1 + 2;
+                #Here I will calculate 16-bit checksum for the whole packet then, I will attach it to end of the packet.
+                chsum = checkSumCalc(bytearray(str(command_inject_udp_packet[1:])+str_lowpanbytes))
+                if not outputBufLock:
+                    outputBufLock = True
+                    outputBuf += [str(command_inject_udp_packet)+str_lowpanbytes+str(chsum)]
+                    outputBufLock  = False
+                time.sleep(0.4)
     except KeyboardInterrupt:
         #socketThread_object.close()
         moteProbe_object.close()

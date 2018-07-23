@@ -177,6 +177,12 @@ class moteProbe(threading.Thread):
                     self.close()
                 else:
                     payload_length = payload_length + 1
+
+
+	elif self.inputBuf[1] == 'A':
+            print "output message: "+":".join("{:02x}".format(ord(c)-48) for c in self.inputBuf[2:])
+            # added by Ayca to print out direct numbers / works differently with letters
+
         elif self.inputBuf[1] == 'R':
             print "command response: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:])
             response1 = "".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:])
@@ -328,10 +334,7 @@ def checkSumCalc(pkt):
     return bytearray(result)
 
 if __name__=="__main__":
-    moteProbe_object    = moteProbe('/dev/ttyUSB1')
-    print "Interactive mode. Commands:"
-    print "  root to make mote DAGroot"
-    print "  inject to inject packet"
+    moteProbe_object    = moteProbe('/dev/ttyUSB0')
     print "  ipv6 to inject one packet"
     print "  sch to get mote schedule"
     print "  tx to add tx slot"
