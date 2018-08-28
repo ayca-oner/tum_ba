@@ -181,7 +181,16 @@ class moteProbe(threading.Thread):
 
 	elif self.inputBuf[1] == 'A':
             print "output message: "+":".join("{:02x}".format(ord(c)-48) for c in self.inputBuf[2:])
-            # added by Ayca to print out direct numbers / works differently with letters
+            # added by Ayca to print out direct numbers / works differently with letters / only works with openserial_printf when directly printing numbers, exp: openserial_printf("1", 1, 'A')
+
+	elif self.inputBuf[1] == 'B':
+            print "Priority List : "+":".join("{:02x}".format(ord(c)-48) for c in self.inputBuf[2::3])
+	# added by Ayca to print out the order of priorities, after they have been converted into a string. This format has been designed to work only for 1 character numbers
+
+	elif self.inputBuf[1] == 'C':
+            print "output : "+":".join(format(ord(c)) for c in self.inputBuf[2:])
+            # added by Ayca to print out direct numbers / works differently with letters / not working properly
+
 
         elif self.inputBuf[1] == 'R':
             print "command response: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:])

@@ -367,7 +367,7 @@ void sixtop_request(
 
 //======= from upper layer
 
-owerror_t sixtop_send(OpenQueueEntry_t *msg) {
+owerror_t sixtop_send(OpenQueueEntry_t *msg) {  //ayca!! l2_asn i buraya eklemen lazımm
    
     // set metadata
     msg->owner        = COMPONENT_SIXTOP;

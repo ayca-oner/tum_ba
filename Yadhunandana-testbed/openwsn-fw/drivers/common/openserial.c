@@ -4,7 +4,7 @@
 \author Fabien Chraim <chraim@eecs.berkeley.edu>, March 2012.
 \author Thomas Watteyne <thomas.watteyne@inria.fr>, August 2016.
 */
-
+#include "openrandom.h"
 #include "opendefs.h"
 #include "openserial.h"
 #include "IEEE802154E.h"
@@ -502,6 +502,7 @@ void openserial_sendMeasurement()
 */
 void openserial_setMeasurementVariables(uint8_t channel, asn_t asntx, asn_t asnactual, uint8_t offset, char *eui64b, uint8_t seq)
 {
+     ///latency olcmek icin buraya bakk!! ---ayca
 	uint8_t i; /*, data[30] = { 0 };
 
 	data[0] = 0x43; //Command 
@@ -678,7 +679,22 @@ uint8_t inject_udp_packet()
     }*/
     //Now start forming the udp packet.
     // get a free packet buffer.
-    pkt = openqueue_getFreePacketBuffer(COMPONENT_OPENSERIAL);
+
+    //pkt = openqueue_getFreePacketBuffer(COMPONENT_OPENSERIAL); //the original function used here
+
+    uint8_t a = openrandom_get16b();  // Added by Ayca to generate random number 
+    uint8_t b= a&1;  // generate a "0" or "1"
+
+    if (b==0)
+    {
+        pkt = openqueue_getFreePacketBuffer_withpriority(COMPONENT_OPENSERIAL,1);
+    }
+    else if (b==1)   
+    {
+        pkt = openqueue_getFreePacketBuffer_withpriority(COMPONENT_OPENSERIAL,8);
+    }
+
+
     if (pkt == NULL) {
         openserial_printError(COMPONENT_OPENSERIAL,ERR_NO_FREE_PACKET_BUFFER,
                    (errorparameter_t)0,

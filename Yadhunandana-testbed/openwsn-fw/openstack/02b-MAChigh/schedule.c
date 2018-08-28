@@ -58,14 +58,35 @@ void schedule_init() {
 
    //Added by Nico
    schedule_addSyncSlot();
-   schedule_addResolutionSlots();
+   //schedule_addResolutionSlots();
    schedule_addActiveSlot(
-		NUMSERIALRX,
+		NUMSERIALRX+1,
 		CELLTYPE_SERIALTX,
 		FALSE,
 		0,
 		&temp_neighbor
 	);
+   schedule_addActiveSlot(
+      NUMSERIALRX+2,
+      CELLTYPE_SERIALTX,
+      FALSE,
+      0,
+      &temp_neighbor
+   );
+   schedule_addActiveSlot(
+      NUMSERIALRX+3,
+      CELLTYPE_SERIALTX,
+      FALSE,
+      0,
+      &temp_neighbor
+   );
+   schedule_addActiveSlot(
+      NUMSERIALRX+4,
+      CELLTYPE_SERIALTX,
+      FALSE,
+      0,
+      &temp_neighbor
+   );
     /*schedule_addActiveSlot(
 		NUMSERIALRX+2,
 		CELLTYPE_SERIALTX,
@@ -143,7 +164,7 @@ void schedule_addSyncSlot()
 
 
 	schedule_addActiveSlot(
-		NUMSERIALRX+3,
+		NUMSERIALRX+5,
 		CELLTYPE_MAC_INIT,
 		FALSE,
 		0,

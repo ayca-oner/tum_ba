@@ -41,6 +41,7 @@ status information about several modules in the OpenWSN stack.
 bool debugPrint_queue() {
    debugOpenQueueEntry_t output[QUEUELENGTH];
    uint8_t i;
+   openserial_printf("2",1,'A'); // ayca - was never printed!
    for (i=0;i<QUEUELENGTH;i++) {
       output[i].creator = openqueue_vars.queue[i].creator;
       output[i].owner   = openqueue_vars.queue[i].owner;
@@ -65,47 +66,49 @@ get a new packet buffer to start creating a new packet.
 */
 OpenQueueEntry_t* openqueue_getFreePacketBuffer(uint8_t creator) {
    uint8_t i;
+   uint8_t l;
    INTERRUPT_DECLARATION();
    DISABLE_INTERRUPTS();
-   
-   // refuse to allocate if we're not in sync
-   if (ieee154e_isSynch()==FALSE && creator > COMPONENT_IEEE802154E){
-     ENABLE_INTERRUPTS();
-     return NULL;
-   }
-   
-   // if you get here, I will try to allocate a buffer for you
-   
-   // if there is no space left for high priority queue, don't reserve
-   if (openqueue_isHighPriorityEntryEnough()==FALSE && creator>COMPONENT_SIXTOP_RES){
+
+      // a=4; // -ayca debug
+      // openserial_printf(&a,1,'C');
+      // openserial_printf("8",1,'C');
+
+    // refuse to allocate if we're not in sync
+    if (ieee154e_isSynch()==FALSE && creator > COMPONENT_IEEE802154E){
       ENABLE_INTERRUPTS();
       return NULL;
-   }
-   
-   // walk through queue and find free entry
-   for (i=0;i<QUEUELENGTH;i++) {
-      if (openqueue_vars.queue[i].owner==COMPONENT_NULL) {
-         openqueue_vars.queue[i].creator=creator;
-         openqueue_vars.queue[i].owner=COMPONENT_OPENQUEUE;
-         ENABLE_INTERRUPTS(); 
-         return &openqueue_vars.queue[i];
-      }
-   }
+    }
+    // if you get here, I will try to allocate a buffer for you
+
+    // if there is no space left for high priority queue, don't reserve
+    if (openqueue_isHighPriorityEntryEnough()==FALSE && creator>COMPONENT_SIXTOP_RES){
+       ENABLE_INTERRUPTS();
+       return NULL;
+    }
+    // walk through queue and find free entry
+    for (i=0;i<QUEUELENGTH;i++) {
+       if (openqueue_vars.queue[i].owner==COMPONENT_NULL) {
+          openqueue_vars.queue[i].creator=creator;
+          openqueue_vars.queue[i].owner=COMPONENT_OPENQUEUE;   
+          openqueue_vars.queue[i].priority=4;
+          openqueue_sortpriority();    
+          ENABLE_INTERRUPTS(); 
+          return &openqueue_vars.queue[i];
+       }
+    }
     
-    openqueue_sortpriority();
-    openserial_printf("1",1,'A');
-    
-   ENABLE_INTERRUPTS();
-   return NULL;
+    ENABLE_INTERRUPTS();
+    return NULL;
 }
 
 void openqueue_sortpriority(){
-    uint8_t i, j, k, c, a, temp;
+    uint8_t b, j, k, l, c, a, temp;
     INTERRUPT_DECLARATION();
     DISABLE_INTERRUPTS();
-    
-    for (i = 1; i < QUEUELENGTH; i++){
-        c = i;
+
+    for (b = 1; b < QUEUELENGTH; b++){
+        c = b;
         do{
             a = (c - 1) / 2;
             if (openqueue_vars.queue[a].priority < openqueue_vars.queue[c].priority){
@@ -116,6 +119,8 @@ void openqueue_sortpriority(){
             c = a;
         } while (c != 0);
     }
+
+    //openserial_printf("4",1,'A');// ayca- debug
     
     for (k = 0; k < QUEUELENGTH; k++)
     {
@@ -138,6 +143,17 @@ void openqueue_sortpriority(){
             a = c;
         } while (c < j);
     }
+
+      int i = 0, len = 0, count = 10;
+      char string[64] = { 0 };   
+
+      for (; i < count; ++i)
+      {
+          len += sprintf(&string[len], "%d%s", openqueue_vars.queue[i].priority, i == count - 1 ? "\n" : ", ");
+      }
+
+      openserial_printf(string,30,'B');
+
     ENABLE_INTERRUPTS();
     //    return NULL;
 }
@@ -146,14 +162,11 @@ void openqueue_sortpriority(){
 //after the first for it is not correctly sorted from high-to-low or low-to-high
 //after the second for, the sorting is complete from low-to-high
 
-// I wrote the code for sorting inside openqueue_macGetDataPacket so that the functions wouldn't get messed up
-// and I wouldn't disrupt the actions in other files, the sorting will immediately be summoned when the function
-// openqueue_macGetDataPacket is used
-
 // uint8_t openserial_printf(char *ch,uint8_t data_len,uint8_t type); as given in openserial.h
 
 OpenQueueEntry_t* openqueue_getFreePacketBuffer_withpriority(uint8_t creator, uint8_t priority ) {
     uint8_t i;
+    uint8_t l;
     INTERRUPT_DECLARATION();
     DISABLE_INTERRUPTS();
     
@@ -164,7 +177,9 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer_withpriority(uint8_t creator, ui
     }
     
     // if you get here, I will try to allocate a buffer for you
-    
+
+    openserial_printf("6",1,'A'); // ayca - debug
+
     // if there is no space left for high priority queue, don't reserve
     if (openqueue_isHighPriorityEntryEnough()==FALSE && creator>COMPONENT_SIXTOP_RES){
         ENABLE_INTERRUPTS();
@@ -177,10 +192,14 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer_withpriority(uint8_t creator, ui
             openqueue_vars.queue[i].creator=creator;
             openqueue_vars.queue[i].owner=COMPONENT_OPENQUEUE;
             openqueue_vars.queue[i].priority=priority;
+            openqueue_sortpriority();
             ENABLE_INTERRUPTS();
             return &openqueue_vars.queue[i];
         }
     }
+
+	openqueue_sortpriority();
+
     ENABLE_INTERRUPTS();
     return NULL;
 }
@@ -197,6 +216,9 @@ owerror_t openqueue_freePacketBuffer(OpenQueueEntry_t* pkt) {
    uint8_t i;
    INTERRUPT_DECLARATION();
    DISABLE_INTERRUPTS();
+
+   //openserial_printf("7",1,'A'); // ayca- debug, after root
+
    for (i=0;i<QUEUELENGTH;i++) {
       if (&openqueue_vars.queue[i]==pkt) {
          if (openqueue_vars.queue[i].owner==COMPONENT_NULL) {
@@ -210,9 +232,6 @@ owerror_t openqueue_freePacketBuffer(OpenQueueEntry_t* pkt) {
          return E_SUCCESS;
       }
    }
-
-   openserial_printf("23",strlen("23"),'A'); // -root bunu yapmıyor
-
 
    // log the error
    openserial_printCritical(COMPONENT_OPENQUEUE,ERR_FREEING_ERROR,
@@ -237,7 +256,7 @@ void openqueue_removeAllCreatedBy(uint8_t creator) {
       }
    }
    //openserial_printf("1847",strlen("1847"),'A'); 
-   // root'ta degil python acilinca sonsuz tekrarlanıyor
+   // ayca- debug, infinite repeat when python code operated
 
    ENABLE_INTERRUPTS();
 }
@@ -257,7 +276,7 @@ void openqueue_removeAllOwnedBy(uint8_t owner) {
          openqueue_reset_entry(&(openqueue_vars.queue[i]));
       }
    }
-    //openserial_printf("1234",strlen("1223"),'A'); // root'ta yok
+    openserial_printf("8",strlen("8"),'A'); // ayca-never!
    ENABLE_INTERRUPTS();
 }
 
@@ -274,7 +293,8 @@ OpenQueueEntry_t* openqueue_sixtopGetSentPacket() {
          return &openqueue_vars.queue[i];
       }
    }
-   openserial_printf("89",strlen("89"),'A'); // root'ta yok
+   openserial_printf("9",strlen("9"),'A'); // ayca - never
+
    ENABLE_INTERRUPTS();
    return NULL;
 }
@@ -290,6 +310,7 @@ OpenQueueEntry_t* openqueue_sixtopGetReceivedPacket() {
          return &openqueue_vars.queue[i];
       }
    }
+   openserial_printf("10",strlen("10"),'A'); //ayca - never
    ENABLE_INTERRUPTS();
    return NULL;
 }
@@ -316,6 +337,7 @@ OpenQueueEntry_t* openqueue_macGetDataPacket(open_addr_t* toNeighbor) {
           return &openqueue_vars.queue[i];
        }
     }
+    //openserial_printf("11",strlen("11"),'A'); // ayca - debug, after root, a lot of times
   
    if (toNeighbor->type==ADDR_64B) {
       // a neighbor is specified, look for a packet unicast to that neigbhbor
@@ -360,7 +382,8 @@ bool openqueue_isHighPriorityEntryEnough(){
             numberOfEntry++;
         }
     }
-    
+    //openserial_printf("12",strlen("12"),'A'); // ayca - debug, after root command
+
     if (numberOfEntry>QUEUELENGTH-HIGH_PRIORITY_QUEUE_ENTRY){
         return FALSE;
     } else {
@@ -380,6 +403,7 @@ OpenQueueEntry_t* openqueue_macGetEBPacket() {
          return &openqueue_vars.queue[i];
       }
    }
+   //openserial_printf("13",strlen("13"),'A'); // ayca - debug, after root, a lot
    ENABLE_INTERRUPTS();
    return NULL;
 }

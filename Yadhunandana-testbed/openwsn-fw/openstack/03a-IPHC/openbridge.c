@@ -52,7 +52,7 @@ void openbridge_triggerData() {
       //openqueue_freePacketBuffer(pkt);
       //return;
       //Yadhu added ends
-      openserial_printf("1847",strlen("1223"),'A'); // -inject bunu yapmıyor
+
       //admin
       pkt->creator  = COMPONENT_OPENBRIDGE;
       pkt->owner    = COMPONENT_OPENBRIDGE;

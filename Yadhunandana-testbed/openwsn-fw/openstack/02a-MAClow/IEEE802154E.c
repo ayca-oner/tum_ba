@@ -3202,7 +3202,7 @@ void notif_sendDone(OpenQueueEntry_t* packetSent, owerror_t error) {
 	// record the outcome of the trasmission attempt
 	packetSent->l2_sendDoneError = error;
 	// record the current ASN
-	memcpy(&packetSent->l2_asn, &ieee154e_vars.asn, sizeof(asn_t));
+	memcpy(&packetSent->l2_asn, &ieee154e_vars.asn, sizeof(asn_t));  // ayca!! l2_asn anla ve sixtop.c ye ekle
 	// associate this packet with the virtual component
 	// COMPONENT_IEEE802154E_TO_RES so RES can knows it's for it
 	packetSent->owner = COMPONENT_IEEE802154E_TO_SIXTOP;
