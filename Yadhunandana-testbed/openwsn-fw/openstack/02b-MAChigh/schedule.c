@@ -45,7 +45,8 @@ void schedule_init() {
    
    // serial RX slot(s)
    start_slotOffset += SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS;
-   memset(&temp_neighbor,0,sizeof(temp_neighbor));
+
+      memset(&temp_neighbor,0,sizeof(temp_neighbor));
    for (running_slotOffset=start_slotOffset;running_slotOffset<start_slotOffset+NUMSERIALRX;running_slotOffset++) {
       schedule_addActiveSlot(
          running_slotOffset,                    // slot offset
@@ -55,38 +56,34 @@ void schedule_init() {
          &temp_neighbor                         // neighbor
       );
    }
+   start_slotOffset += NUMSERIALRX;
 
+   memset(&temp_neighbor,0,sizeof(temp_neighbor));
+   for (running_slotOffset=start_slotOffset;running_slotOffset<start_slotOffset+NUMSERIALTX;running_slotOffset++) {
+      schedule_addActiveSlot(
+         running_slotOffset,                    // slot offset
+         CELLTYPE_SERIALTX,                     // type of slot
+         FALSE,                                 // shared?
+         0,                                     // channel offset
+         &temp_neighbor                         // neighbor
+      );
+   }
+   
+
+
+
+   
    //Added by Nico
    schedule_addSyncSlot();
    //schedule_addResolutionSlots();
-   schedule_addActiveSlot(
+/*   schedule_addActiveSlot(
 		NUMSERIALRX+1,
 		CELLTYPE_SERIALTX,
 		FALSE,
 		0,
 		&temp_neighbor
-	);
-   schedule_addActiveSlot(
-      NUMSERIALRX+2,
-      CELLTYPE_SERIALTX,
-      FALSE,
-      0,
-      &temp_neighbor
-   );
-   schedule_addActiveSlot(
-      NUMSERIALRX+3,
-      CELLTYPE_SERIALTX,
-      FALSE,
-      0,
-      &temp_neighbor
-   );
-   schedule_addActiveSlot(
-      NUMSERIALRX+4,
-      CELLTYPE_SERIALTX,
-      FALSE,
-      0,
-      &temp_neighbor
-   );
+	);*/
+
     /*schedule_addActiveSlot(
 		NUMSERIALRX+2,
 		CELLTYPE_SERIALTX,
@@ -164,12 +161,26 @@ void schedule_addSyncSlot()
 
 
 	schedule_addActiveSlot(
-		NUMSERIALRX+5,
+		NUMSERIALRX+NUMSERIALTX+2,
 		CELLTYPE_MAC_INIT,
 		FALSE,
 		0,
 		&temp_neighbor
 	);
+/*      schedule_addActiveSlot(
+      NUMSERIALRX+NUMSERIALTX+2,
+      CELLTYPE_MAC_INIT,
+      FALSE,
+      0,
+      &temp_neighbor
+   );*/
+/*         schedule_addActiveSlot(
+      NUMSERIALRX+NUMSERIALTX+3,
+      CELLTYPE_MAC_INIT,
+      FALSE,
+      0,
+      &temp_neighbor
+   );*/
 }
 
 /*

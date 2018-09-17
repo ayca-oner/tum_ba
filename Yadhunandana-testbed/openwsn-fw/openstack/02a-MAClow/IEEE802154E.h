@@ -39,7 +39,7 @@ static const uint8_t ebIEsBytestream[] = {
 
 #define NUM_CHANNELS                16 // number of channels to channel hop on
 #define SYNCHRONIZING_CHANNEL       26 // channel the mote listens on to synchronize (physical channel)
-#define TXRETRIES                    1 // number of MAC retries before declaring failed -> changed by Nico to 1 as in sixtop 1 will be added and so we have two-only sent in one frame
+#define TXRETRIES                    3 // number of MAC retries before declaring failed -> changed by Nico to 1 as in sixtop 1 will be added and so we have two-only sent in one frame
 #define TX_POWER                    31 // 1=-25dBm, 31=0dBm (max value)
 #define RESYNCHRONIZATIONGUARD       5 // in 32kHz ticks. min distance to the end of the slot to successfully synchronize
 #define US_PER_TICK                 30 // number of us per 32kHz clock tick
@@ -313,6 +313,7 @@ typedef struct {
 void               ieee154e_init(void);
 // public
 PORT_TIMER_WIDTH   ieee154e_asnDiff(asn_t* someASN);
+PORT_TIMER_WIDTH ieee154e_asnDiff_toEvaluateLatency(asn_t* someASN); //added by Ayca
 #ifdef DEADLINE_OPTION_ENABLED
 int16_t            ieee154e_computeAsnDiff(asn_t* h_asn, asn_t* l_asn);
 void               ieee154e_calculateExpTime(uint16_t max_delay, uint8_t* et_asn);

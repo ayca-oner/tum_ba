@@ -505,6 +505,7 @@ void openserial_setMeasurementVariables(uint8_t channel, asn_t asntx, asn_t asna
      ///latency olcmek icin buraya bakk!! ---ayca
 	uint8_t i; /*, data[30] = { 0 };
 
+
 	data[0] = 0x43; //Command 
 	data[1] = 0x45; //sub category
 
@@ -531,6 +532,8 @@ void openserial_setMeasurementVariables(uint8_t channel, asn_t asntx, asn_t asna
 	data[17] = seq; //Packet sequence number
 
 	openserial_printf(data, 18, SERIAL_MSG_RSP);*/
+
+    // ayca burdan comment basliyor
 		meas[0] = 0x43;
 		meas[1] = 0x45;
 		meas[2] = channel;
@@ -548,7 +551,15 @@ void openserial_setMeasurementVariables(uint8_t channel, asn_t asntx, asn_t asna
 		meas[16] = asnactual.bytes0and1;
 
 		meas[17] = seq;
-		openserial_printf(meas, 18, SERIAL_MSG_RSP);
+
+        openserial_printf(meas, 18, SERIAL_MSG_RSP); // the real function used here
+
+    //    buraya kadar comment ben yaptım*/
+
+        //asnDiff = asnactual - asntx;
+        //openserial_printf(&asnDiff, strlen(asnDiff),'A' );
+		
+        openserial_printf("444", strlen("444"),'A' ); //ayca - debug
 }
 
 /**

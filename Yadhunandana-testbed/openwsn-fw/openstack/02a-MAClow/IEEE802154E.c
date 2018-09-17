@@ -205,6 +205,40 @@ PORT_TIMER_WIDTH ieee154e_asnDiff(asn_t* someASN) {
 	ENABLE_INTERRUPTS();
 	return diff;
 }
+// Added by Ayca, to print out the ASN Difference without harming 
+PORT_TIMER_WIDTH ieee154e_asnDiff_toEvaluateLatency(asn_t* someASN) {
+	PORT_TIMER_WIDTH diff;
+	INTERRUPT_DECLARATION();
+	DISABLE_INTERRUPTS();
+	if (ieee154e_vars.asn.byte4 != someASN->byte4) {
+		ENABLE_INTERRUPTS();
+		openserial_printf("12345", strlen("11111"),'A' ); //ayca - debug
+		return (PORT_TIMER_WIDTH)0xFFFFFFFF;;
+	}
+
+	diff = 0;
+	if (ieee154e_vars.asn.bytes2and3 == someASN->bytes2and3) {
+		uint8_t c,d;
+		d=ieee154e_vars.asn.bytes0and1 - someASN->bytes0and1;
+		openserial_printf(&d, 1,'C' ); //ayca - print asn diff
+		openserial_printf("55555", strlen("11111"),'A' ); //ayca - debug
+		ENABLE_INTERRUPTS();
+		return ieee154e_vars.asn.bytes0and1 - someASN->bytes0and1;
+	}
+	else if (ieee154e_vars.asn.bytes2and3 - someASN->bytes2and3 == 1) {
+		openserial_printf("45678", strlen("11111"),'A' ); //ayca - debug
+		diff = ieee154e_vars.asn.bytes0and1;
+		diff += 0xffff - someASN->bytes0and1;
+		diff += 1;
+	}
+	else {
+		diff = (PORT_TIMER_WIDTH)0xFFFFFFFF;;
+	}
+	openserial_printf("11111", strlen("11111"),'A' ); //ayca - debug
+	openserial_printf(&diff, strlen(diff),'C' ); //ayca - debug
+	ENABLE_INTERRUPTS();
+	return diff;
+}
 
 #ifdef DEADLINE_OPTION_ENABLED
 /**
@@ -775,6 +809,9 @@ port_INLINE void activity_synchronize_endOfFrame(PORT_TIMER_WIDTH capturedTime) 
 		return;
 	}
 
+	//memcpy(&ieee154e_vars.dataReceived->l2_asn, &ieee154e_vars.asn, sizeof(asn_t)); // ayca, record current ASN , denemee
+	//openserial_printf(&ieee154e_vars.dataReceived->l2_asn, 5, 'A');
+
 	// declare ownership over that packet
 	ieee154e_vars.dataReceived->creator = COMPONENT_IEEE802154E;
 	ieee154e_vars.dataReceived->owner = COMPONENT_IEEE802154E;
@@ -1040,7 +1077,7 @@ port_INLINE void activity_ti1ORri1() {
 		//openserial_stop();
 		// abort the slot
 		endSlot();
-		opentimers_measure_ticks(0, 0);
+		//opentimers_measure_ticks(0, 0);
 		//start outputing serial
 		openserial_startOutput();
 		return;
@@ -1076,11 +1113,31 @@ port_INLINE void activity_ti1ORri1() {
 			ieee154e_vars.dataToSend = openqueue_macGetDataPacket(&neighbor);
 		}
 
-		if (ieee154e_vars.dataToSend == NULL) {
+		if (ieee154e_vars.dataToSend == NULL || idmanager_getIsDAGroot() == TRUE) 
+		{
 			changeToRX = TRUE;
+
 		}
 
 		else {
+			if (idmanager_getIsDAGroot() == FALSE)
+			{
+			//aycaa; datatosend'in asn'i ile karsilastir!!!
+			openserial_printf("8888", strlen("1111"), 'A'); //-ayca debug output regularly
+			//openserial_printf(&ieee154e_vars.asn.bytes0and1, 2, 'F');
+			//openserial_printf(&ieee154e_vars.asn.bytes2and3, 2, 'F');
+			//openserial_printf(&ieee154e_vars.asn.byte4, 1, 'F');
+			//uint8_t array[5];
+			//ieee154e_getAsn(array);
+			//openserial_printf(array, 5, 'F');
+			openserial_printf(&ieee154e_vars.asn, 5,'F' );
+			//openserial_printf(&ieee154e_vars.dataReceived->l2_asn, 5,'G' ); //ayca - 110:110:110:0:0 cok farkli bir seyler cikiyor
+			openserial_printf(&ieee154e_vars.dataToSend->l2_asn, 5,'H' );
+			openserial_printf(&ieee154e_vars.dataToSend->priority, 1, 'G');
+			ieee154e_asnDiff_toEvaluateLatency(&ieee154e_vars.dataToSend->l2_asn); //-ayca
+			openserial_printf("2222", strlen("1111"), 'A'); //-ayca debug output regularly
+			}
+			
 			//Sending in INIT slot
 			ieee154e_measurement.timesSent++;
 
@@ -1218,7 +1275,12 @@ port_INLINE void activity_ti1ORri1() {
 				}
 
 				else {
-
+					if (idmanager_getIsDAGroot() == FALSE)
+					{
+					//aycaa; datatosend'in asn'i ile karsilastir!!!
+					openserial_printf("9999", strlen("1111"), 'A'); //ayca, burdan output yok
+					ieee154e_asnDiff_toEvaluateLatency(&ieee154e_vars.dataReceived->l2_asn); //ayca
+					}
 
 					// change state
 					changeState(S_TXDATAOFFSET);
@@ -1363,6 +1425,13 @@ port_INLINE void activity_ti1ORri1() {
 			}
 		}
 		else {
+			if (idmanager_getIsDAGroot() == FALSE)
+			{
+			//aycaa; datatosend'in asn'i ile karsilastir!!!
+			openserial_printf("7777", strlen("1111"), 'A'); //-ayca debug
+			ieee154e_asnDiff_toEvaluateLatency(&ieee154e_vars.dataReceived->l2_asn); //-ayca
+			}
+			
 			// change state
 			changeState(S_TXDATAOFFSET);
 			// change owner
@@ -1459,13 +1528,13 @@ port_INLINE void activity_ti1ORri1() {
 		ieee154e_vars.numOfSleepSlots = NUMSERIALRX;
 
 		//increase ASN by NUMSERIALRX-1 slots as at this slot is already incremented by 1
-		for (i = 0; i < NUMSERIALRX - 1; i++) {
+		//for (i = 0; i < NUMSERIALRX - 1; i++) {
 			incrementAsnOffset();
 			// advance the schedule
 			schedule_advanceSlot();
 			// find the next one
 			ieee154e_vars.nextActiveSlotOffset = schedule_getNextActiveSlotOffset();
-		}
+		//}
 		// possibly skip additional slots if enabled
 		if (idmanager_getIsSlotSkip() && idmanager_getIsDAGroot() == FALSE) {
 			if (ieee154e_vars.nextActiveSlotOffset > ieee154e_vars.slotOffset) {
@@ -1483,12 +1552,12 @@ port_INLINE void activity_ti1ORri1() {
 		// set the timer based on calcualted number of slots to skip
 		opentimers_scheduleAbsolute(
 			ieee154e_vars.timerId,                            // timerId
-			TsSlotDuration*(ieee154e_vars.numOfSleepSlots),   // duration
+			TsSlotDuration,   // duration
 			ieee154e_vars.startOfSlotReference,               // reference
 			TIME_TICS,                                        // timetype
 			isr_ieee154e_newSlot                              // callback
 		);
-		ieee154e_vars.slotDuration = TsSlotDuration*(ieee154e_vars.numOfSleepSlots);
+		ieee154e_vars.slotDuration = TsSlotDuration;
 		// radiotimer_setPeriod(TsSlotDuration*(ieee154e_vars.numOfSleepSlots));
 
 #ifdef ADAPTIVE_SYNC
@@ -2326,12 +2395,15 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
 
 		// record the timeCorrection and print out at end of slot
 		ieee154e_vars.dataReceived->l2_timeCorrection = (PORT_SIGNED_INT_WIDTH)((PORT_SIGNED_INT_WIDTH)TsTxOffset - (PORT_SIGNED_INT_WIDTH)ieee154e_vars.syncCapturedTime);
+		
+		// -ayca added, previously asnDiff was here!
 
 		//Added by Nico
 		//A packet has been successfully received, so we can send measurement infos, only as DAGroot and if measurement is enabled of course
 		if (idmanager_getIsDAGroot() == TRUE && ieee154e_measurement.resEnabled == TRUE && ieee154e_vars.dataReceived->l2_frameType == IEEE154_TYPE_DATA)
 		{
-			openserial_setMeasurementVariables(ieee154e_vars.freq, ieee154e_vars.dataReceived->l2_asn, ieee154e_vars.asn, ieee154e_vars.slotOffset, ieee154e_vars.dataReceived->l3_sourceAdd.addr_128b, ieee154e_vars.dataReceived->l2_dsn);
+			//openserial_setMeasurementVariables(ieee154e_vars.freq, ieee154e_vars.dataReceived->l2_asn, ieee154e_vars.asn, ieee154e_vars.slotOffset, ieee154e_vars.dataReceived->l3_sourceAdd.addr_128b, ieee154e_vars.dataReceived->l2_dsn);
+			//- commented by ayca
 		}
 
 		// check if ack requested
@@ -2561,13 +2633,13 @@ port_INLINE void activity_ri7() {
 	//Added by Nico
 	//Don't send/send sporadically if measurement is on, i am DAGroot and we are in INIT slot
 	//This simulates a second mote, whereas noone gets a access
-	uint16_t randomvalue = openrandom_get16b();
-	randomvalue = randomvalue & 0x0004;
+//	uint16_t randomvalue = openrandom_get16b();
+//	randomvalue = randomvalue & 0x0004;
 
-	if (idmanager_getIsDAGroot() == TRUE && ieee154e_measurement.resEnabled == TRUE && schedule_getType() == CELLTYPE_MAC_INIT && randomvalue == 0x0000)
-	{
-		return;
-	}
+//	if (idmanager_getIsDAGroot() == TRUE && ieee154e_measurement.resEnabled == TRUE && schedule_getType() == CELLTYPE_MAC_INIT && randomvalue == 0x0000)
+//	{
+//		return;
+//	}
 
 	// give the 'go' to transmit
 	radio_txNow();
@@ -3202,7 +3274,7 @@ void notif_sendDone(OpenQueueEntry_t* packetSent, owerror_t error) {
 	// record the outcome of the trasmission attempt
 	packetSent->l2_sendDoneError = error;
 	// record the current ASN
-	memcpy(&packetSent->l2_asn, &ieee154e_vars.asn, sizeof(asn_t));  // ayca!! l2_asn anla ve sixtop.c ye ekle
+	//memcpy(&packetSent->l2_asn, &ieee154e_vars.asn, sizeof(asn_t));  // ayca!! ASN!! l2_asn anla ve sixtop.c ye ekle
 	// associate this packet with the virtual component
 	// COMPONENT_IEEE802154E_TO_RES so RES can knows it's for it
 	packetSent->owner = COMPONENT_IEEE802154E_TO_SIXTOP;
@@ -3216,7 +3288,7 @@ void notif_receive(OpenQueueEntry_t* packetReceived) {
 	//opentimers_measure_ticks(0,0);
 	isPacketReceived = TRUE;
 	// record the current ASN
-	memcpy(&packetReceived->l2_asn, &ieee154e_vars.asn, sizeof(asn_t));
+	//memcpy(&packetReceived->l2_asn, &ieee154e_vars.asn, sizeof(asn_t));
 	// indicate reception to the schedule, to keep statistics
 	schedule_indicateRx(&packetReceived->l2_asn);
 	// associate this packet with the virtual component

@@ -1,0 +1,490 @@
+serial thread: moteProbe@/dev/ttyUSB1 started successfully
+  ipv6 to inject one packet
+  sch to get mote schedule
+  tx to add tx slot
+  rx to add rx slot
+  neighbors to show neighbors
+  reset to reset the board
+  meas to toggle measurement mode
+  measreset to reset measurement
+  measresult to get measurement result
+  quit to exit 
+>> Priority Queue : 04:00:00:00:00:00:00:00:00:00
+Priority Queue : 04:00:00:00:00:00:00:00:00:00
+Priority Queue : 04:00:00:00:00:00:00:00:00:00
+inject
+Entering packet inject mode
+
+Priority Queue : 08:00:00:00:00:00:00:00:00:00
+Priority Queue : 04:00:00:00:00:00:00:00:00:00
+
+Priority Queue : 01:00:00:00:00:00:00:00:00:00
+
+Priority Queue : 01:00:00:00:00:00:00:00:00:00
+
+Priority Queue : 01:00:00:00:00:00:00:00:00:00
+
+Priority Queue : 08:00:00:00:00:00:00:00:00:00
+Priority Queue : 04:00:00:00:00:00:00:00:00:00
+
+Priority Queue : 01:00:00:00:00:00:00:00:00:00
+
+Priority Queue : 01:00:00:00:00:00:00:00:00:00
+Priority Queue : 04:00:00:00:00:00:00:00:00:00
+
+Priority Queue : 01:00:00:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:37:3
+Old ASN? : 0:0:0:37:3
+Priority of dataToSend  : 1
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:00:00:00:00:03:25:ff:00:00:00:03:25:1a
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:52:3
+
+Old ASN? : 0:0:0:37:3
+Priority of dataToSend  : 1
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:00:00:00:00:03:25:ff:00:00:00:03:34:1a
+Priority Queue : 01:00:00:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:67:3
+Old ASN? : 0:0:0:67:3
+Priority of dataToSend  : 1
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+
+command response: 43:44:01:00:00:00:03:43:ff:00:00:00:03:43:1a
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:82:3
+Old ASN? : 0:0:0:67:3
+Priority of dataToSend  : 1
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+
+command response: 43:44:01:00:00:00:03:43:ff:00:00:00:03:52:1a
+Priority Queue : 08:00:00:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:97:3
+Old ASN? : 0:0:0:97:3
+Priority of dataToSend  : 8
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:02:00:00:00:03:61:ff:00:00:00:03:61:1a
+Priority Queue : 08:08:00:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+
+Current ASN : 0:0:0:112:3
+Old ASN? : 0:0:0:97:3
+Priority of dataToSend  : 8
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:02:00:00:00:03:61:ff:00:00:00:03:70:1a
+Priority Queue : 08:04:00:00:00:00:00:00:00:00
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:127:3
+Old ASN? : 0:0:0:112:3
+Priority of dataToSend  : 4
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:03:00:00:00:03:70:ff:00:00:00:03:7f:1a
+
+Priority Queue : 04:01:00:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:142:3
+Old ASN? : 0:0:0:142:3
+Priority of dataToSend  : 4
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:04:00:00:00:03:8e:ff:00:00:00:03:8e:1a
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:157:3
+Old ASN? : 0:0:0:142:3
+Priority of dataToSend  : 4
+ASN Difference : 15
+
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:04:00:00:00:03:8e:ff:00:00:00:03:9d:1a
+Priority Queue : 01:01:00:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:172:3
+Old ASN? : 0:0:0:172:3
+Priority of dataToSend  : 1
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:05:00:00:00:03:ac:ff:00:00:00:03:ac:1a
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:187:3
+
+Old ASN? : 0:0:0:172:3
+Priority of dataToSend  : 1
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:05:00:00:00:03:ac:ff:00:00:00:03:bb:1a
+Priority Queue : 08:01:00:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:202:3
+Old ASN? : 0:0:0:202:3
+Priority of dataToSend  : 8
+ASN Difference : 0
+Current ASN : 0:0:0:217:3
+Old ASN? : 0:0:0:202:3
+Priority of dataToSend  : 8
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:06:00:00:00:03:ca:ff:00:00:00:03:d9:1a
+Priority Queue : 08:01:00:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:232:3
+Old ASN? : 0:0:0:232:126
+Priority of dataToSend  : 8
+ASN Difference : 0
+Priority Queue : 08:01:01:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:247:3
+Old ASN? : 0:0:0:232:3
+Priority of dataToSend  : 8
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+Priority of dataToSend  : 1
+ASN Difference : 150
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+
+command response: 43:44:03:00:00:00:03:70:ff:00:00:00:04:06:1a
+Priority Queue : 01:01:01:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:21:4
+Old ASN? : 0:0:0:21:4
+Priority of dataToSend  : 1
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:09:00:00:00:04:15:ff:00:00:00:04:15:1a
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:36:4
+
+Old ASN? : 0:0:0:21:4
+Priority of dataToSend  : 1
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:09:00:00:00:04:15:ff:00:00:00:04:24:1a
+Priority Queue : 01:01:01:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:51:4
+Old ASN? : 0:0:0:51:4
+Priority of dataToSend  : 1
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+
+command response: 43:44:0a:00:00:00:04:33:ff:00:00:00:04:33:1a
+Priority Queue : 04:01:01:00:00:00:00:00:00:00
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:66:4
+Old ASN? : 0:0:0:51:4
+Priority of dataToSend  : 4
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+
+Debug by Ayca: 02:02:02:02
+command response: 43:44:0a:00:00:00:04:33:ff:00:00:00:04:42:1a
+Priority Queue : 01:01:01:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:81:4
+Old ASN? : 0:0:0:81:4
+Priority of dataToSend  : 1
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:0b:00:00:00:04:51:ff:00:00:00:04:51:1a
+Priority Queue : 04:01:01:00:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:96:4
+Old ASN? : 0:0:0:81:4
+Priority of dataToSend  : 4
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:0b:00:00:00:04:51:ff:00:00:00:04:60:1a
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:111:4
+Old ASN? : 0:0:0:92:4
+Priority of dataToSend  : 1
+ASN Difference : 19
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:0c:00:00:00:04:5c:ff:00:00:00:04:6f:1a
+
+Priority Queue : 04:01:01:00:00:00:00:00:00:00
+Priority Queue : 04:01:01:01:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:126:4
+Old ASN? : 0:0:0:92:4
+Priority of dataToSend  : 1
+ASN Difference : 34
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:0c:00:00:00:04:5c:ff:00:00:00:04:7e:1a
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:141:4
+Old ASN? : 0:0:0:247:3
+Priority of dataToSend  : 1
+
+ASN Difference : 150
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:08:00:00:00:03:f7:ff:00:00:00:04:8d:1a
+Priority Queue : 08:04:01:01:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:156:4
+Old ASN? : 0:0:0:156:4
+Priority of dataToSend  : 4
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:0f:00:00:00:04:9c:ff:00:00:00:04:9c:1a
+Debug by Ayca: 08:08:08:08
+
+Current ASN : 0:0:0:171:4
+Old ASN? : 0:0:0:156:4
+Priority of dataToSend  : 4
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:0f:00:00:00:04:9c:ff:00:00:00:04:7e:20
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:126:2:83
+Current ASN : 0:0:0:201:4
+Old ASN? : 0:0:0:186:4
+Priority of dataToSend  : 8
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:10:00:00:00:04:ba:ff:00:00:00:04:c9:1a
+Priority Queue : 08:08:01:01:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:216:4
+Old ASN? : 0:0:0:216:4
+Priority of dataToSend  : 8
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:4e
+Current ASN : 0:0:0:231:4
+Old ASN? : 0:0:0:216:4
+Priority of dataToSend  : 8
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:11:00:00:00:04:d8:ff:00:00:7e:02:53:00
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:246:4
+Old ASN? : 0:0:0:247:3
+Priority of dataToSend  : 1
+ASN Difference : 255
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:08:00:00:00:03:f7:ff:00:00:7e:02:53:00
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:5:5
+Old ASN? : 0:0:0:126:4
+Priority of dataToSend  : 1
+ASN Difference : 135
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:0d:00:00:00:04:7e:ff:00:00:00:05:05:1a
+Priority Queue : 08:04:01:01:00:00:00:00:00:00
+
+Priority Queue : 08:01:01:01:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:20:5
+
+Old ASN? : 0:0:0:20:5
+Priority of dataToSend  : 1
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:12:00:00:00:05:14:ff:00:00:00:05:14:1a
+Priority Queue : 08:08:01:01:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:35:5
+Old ASN? : 0:0:0:20:5
+Priority of dataToSend  : 8
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+
+command response: 43:44:12:00:00:00:05:14:ff:00:00:00:05:23:1a
+Priority Queue : 08:08:01:01:00:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:50:5
+Old ASN? : 0:0:0:50:5
+Priority of dataToSend  : 8
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:14:00:00:00:05:32:ff:00:00:00:05:32:1a
+Priority Queue : 08:08:01:01:01:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+
+Current ASN : 0:0:0:65:5
+Old ASN? : 0:0:0:50:5
+Priority of dataToSend  : 8
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:14:00:00:00:05:32:ff:00:00:00:05:41:1a
+Debug by Ayca: 08:08:08:08
+
+Current ASN : 0:0:0:80:5
+Old ASN? : 0:0:0:35:5
+Priority of dataToSend  : 1
+ASN Difference : 45
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:13:00:00:00:05:23:ff:00:00:00:05:50:1a
+Priority Queue : 08:01:01:01:01:00:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:95:5
+Old ASN? : 0:0:0:95:5
+Priority of dataToSend  : 1
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+
+Debug by Ayca: 02:02:02:02
+command response: 43:44:16:00:00:00:05:5f:ff:00:00:00:05:5f:1a
+Priority Queue : 08:01:01:01:01:01:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:110:5
+Old ASN? : 0:0:0:95:5
+Priority of dataToSend  : 1
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:16:00:00:00:05:5f:ff:00:00:7e:06:41:38
+Current ASN : 0:0:0:125:5
+Old ASN? : 0:0:0:35:5
+Priority of dataToSend  : 1
+ASN Difference : 90
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:13:00:00:00:05:23:ff:00:00:00:05:7d:1a
+Priority Queue : 08:08:01:01:01:01:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:140:5
+Old ASN? : 0:0:0:140:5
+Priority of dataToSend  : 8
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:18:00:00:00:05:8c:ff:00:00:00:05:8c:1a
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:126:2:83
+
+Old ASN? : 0:0:0:140:5
+Priority of dataToSend  : 8
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:18:00:00:00:05:8c:ff:00:7e:06:41:38:38
+Current ASN : 0:0:0:170:5
+Old ASN? : 0:0:0:126:4
+Priority of dataToSend  : 1
+ASN Difference : 44
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:0d:00:00:00:04:7e:ff:00:00:00:05:aa:1a
+Priority Queue : 08:08:01:01:01:01:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:185:5
+Old ASN? : 0:0:0:185:5
+Priority of dataToSend  : 8
+ASN Difference : 0
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:19:00:00:00:05:b9:ff:00:00:00:05:b9:1a
+
+Priority Queue : 08:08:08:01:01:01:00:00:00:00
+Debug by Ayca: 01:08:04:07
+Debug by Ayca: 01:07:06:05
+Debug by Ayca: 08:08:08:08
+Current ASN : 0:0:0:200:5
+
+Old ASN? : 0:0:0:185:5
+Priority of dataToSend  : 8
+ASN Difference : 15
+Debug by Ayca: 05:05:05:05:05
+Debug by Ayca: 02:02:02:02
+command response: 43:44:19:00:00:00:05:b9:ff:00:00:00:05:c8:1a
+Priority Queue : 08:08:01:01:01:01:00:00:00:00
+
+Script done on 2018-09-13 15:08:46+0200

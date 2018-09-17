@@ -26,6 +26,9 @@
 
 sixtop_vars_t sixtop_vars;
 
+ieee154e_vars_t    ieee154e_vars; //ayca
+
+
 //=========================== prototypes ======================================
 
 // send internal
@@ -367,7 +370,7 @@ void sixtop_request(
 
 //======= from upper layer
 
-owerror_t sixtop_send(OpenQueueEntry_t *msg) {  //ayca!! l2_asn i buraya eklemen lazımm
+owerror_t sixtop_send(OpenQueueEntry_t *msg) {  //ayca!! l2_asn i buraya eklemem gerekli
    
     // set metadata
     msg->owner        = COMPONENT_SIXTOP;
@@ -377,7 +380,17 @@ owerror_t sixtop_send(OpenQueueEntry_t *msg) {  //ayca!! l2_asn i buraya eklemen
     msg->l2_securityLevel   = IEEE802154_security_getSecurityLevel(msg);
     msg->l2_keyIdMode       = IEEE802154_SECURITY_KEYIDMODE; 
     msg->l2_keyIndex        = IEEE802154_security_getDataKeyIndex();
-  
+
+    openserial_printf("1847",strlen("1847"),'A'); // ayca- debug
+
+    asn_t currentasn = ieee154e_getASN();
+    openserial_printf(&currentasn, 5,'H' );
+    memcpy(&msg->l2_asn, &currentasn, sizeof(asn_t)); // ayca, record current ASN  //&ieee154e_vars.asn
+    openserial_printf(&msg->l2_asn, 5,'H' );
+    //uint8_t array[5];
+    //ieee154e_getAsn(array);
+    //openserial_printf(&currentasn, 5, 'H');
+
     if (msg->l2_payloadIEpresent == FALSE) {
         return sixtop_send_internal(
           msg,

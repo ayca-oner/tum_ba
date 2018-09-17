@@ -5,6 +5,7 @@
 #include "IEEE802154E.h"
 #include "IEEE802154_security.h"
 
+
 //=========================== defination =====================================
 
 #define HIGH_PRIORITY_QUEUE_ENTRY 5
@@ -70,10 +71,6 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer(uint8_t creator) {
    INTERRUPT_DECLARATION();
    DISABLE_INTERRUPTS();
 
-      // a=4; // -ayca debug
-      // openserial_printf(&a,1,'C');
-      // openserial_printf("8",1,'C');
-
     // refuse to allocate if we're not in sync
     if (ieee154e_isSynch()==FALSE && creator > COMPONENT_IEEE802154E){
       ENABLE_INTERRUPTS();
@@ -97,6 +94,8 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer(uint8_t creator) {
           return &openqueue_vars.queue[i];
        }
     }
+
+    openqueue_sortpriority();
     
     ENABLE_INTERRUPTS();
     return NULL;
@@ -107,7 +106,7 @@ void openqueue_sortpriority(){
     INTERRUPT_DECLARATION();
     DISABLE_INTERRUPTS();
 
-    for (b = 1; b < QUEUELENGTH; b++){
+     for (b = 1; b < QUEUELENGTH; b++){
         c = b;
         do{
             a = (c - 1) / 2;
@@ -126,15 +125,15 @@ void openqueue_sortpriority(){
     {
         j= QUEUELENGTH-1-k;
         temp = openqueue_vars.queue[0].priority;
-        openqueue_vars.queue[0].priority = openqueue_vars.queue[j].priority;    /* swap max element with rightmost leaf element */
+        openqueue_vars.queue[0].priority = openqueue_vars.queue[j].priority;    // swap max element with rightmost leaf element 
         openqueue_vars.queue[j].priority = temp;
         a = 0;
         do
         {
-            c = 2 * a + 1;    /* left node of root element */
+            c = 2 * a + 1;    // left node of root element 
             if ((openqueue_vars.queue[c].priority < openqueue_vars.queue[c + 1].priority) && c < j-1)
                 c++;
-            if (openqueue_vars.queue[a].priority<openqueue_vars.queue[c].priority && c<j)    /* again rearrange to max heap array */
+            if (openqueue_vars.queue[a].priority<openqueue_vars.queue[c].priority && c<j)    // again rearrange to max heap array 
             {
                 temp = openqueue_vars.queue[a].priority;
                 openqueue_vars.queue[a].priority = openqueue_vars.queue[c].priority;
@@ -142,7 +141,18 @@ void openqueue_sortpriority(){
             }
             a = c;
         } while (c < j);
-    }
+    } 
+
+    b = QUEUELENGTH - 1;
+    j = 0;
+    while(b > j)
+    {
+        temp = openqueue_vars.queue[b].priority;
+        openqueue_vars.queue[b].priority = openqueue_vars.queue[j].priority;
+        openqueue_vars.queue[j].priority = temp;
+        b--;
+        j++;
+  }
 
       int i = 0, len = 0, count = 10;
       char string[64] = { 0 };   
@@ -178,7 +188,7 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer_withpriority(uint8_t creator, ui
     
     // if you get here, I will try to allocate a buffer for you
 
-    openserial_printf("6",1,'A'); // ayca - debug
+    //openserial_printf("6",1,'A'); // ayca - debug
 
     // if there is no space left for high priority queue, don't reserve
     if (openqueue_isHighPriorityEntryEnough()==FALSE && creator>COMPONENT_SIXTOP_RES){
@@ -204,7 +214,7 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer_withpriority(uint8_t creator, ui
     return NULL;
 }
 
-/**
+/*
 \brief Free a previously-allocated packet buffer.
 
 \param pkt A pointer to the previsouly-allocated packet buffer.

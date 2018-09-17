@@ -180,17 +180,31 @@ class moteProbe(threading.Thread):
 
 
 	elif self.inputBuf[1] == 'A':
-            print "output message: "+":".join("{:02x}".format(ord(c)-48) for c in self.inputBuf[2:])
+            print "Debug by Ayca: "+":".join("{:02x}".format(ord(c)-48) for c in self.inputBuf[2:])
             # added by Ayca to print out direct numbers / works differently with letters / only works with openserial_printf when directly printing numbers, exp: openserial_printf("1", 1, 'A')
 
 	elif self.inputBuf[1] == 'B':
-            print "Priority List : "+":".join("{:02x}".format(ord(c)-48) for c in self.inputBuf[2::3])
+            print "Priority Queue : "+":".join("{:02x}".format(ord(c)-48) for c in self.inputBuf[2::3])
 	# added by Ayca to print out the order of priorities, after they have been converted into a string. This format has been designed to work only for 1 character numbers
 
-
 	elif self.inputBuf[1] == 'C':
-            print "output : "+":".join(format(ord(c)) for c in self.inputBuf[2:])
-            # added by Ayca to print out direct numbers / works differently with letters / not working properly
+            print "ASN Difference : "+":".join(format(ord(c)) for c in self.inputBuf[2:])
+	    print ""
+            # added by Ayca to print out direct numbers / works differently with letters / only works with openserial_printf when directly printing numbers, exp: a=10,b=1, c=a-b openserial_printf(&c, 1, 'A') working properly
+	
+	elif self.inputBuf[1] == 'F':
+            print "Current ASN : "+":".join(format(ord(c)) for c in self.inputBuf[2:])
+            # added by Ayca to print out direct numbers
+
+	elif self.inputBuf[1] == 'H':
+            print "Old ASN? : "+":".join(format(ord(c)) for c in self.inputBuf[2:])
+            # added by Ayca to print out direct numbers 
+ 
+
+	elif self.inputBuf[1] == 'G':
+            print "Priority of dataToSend  : "+":".join(format(ord(c)) for c in self.inputBuf[2:])
+            # added by Ayca to print out direct numbers 
+
 
 
         elif self.inputBuf[1] == 'R':
@@ -234,14 +248,14 @@ class moteProbe(threading.Thread):
                     file.write("\n")
                     file.close
 
-        elif self.inputBuf[1] == 'E':
-            if (int(binascii.hexlify(self.inputBuf[3]),16) == 0x09): #\
+#        elif self.inputBuf[1] == 'E':
+#            if (int(binascii.hexlify(self.inputBuf[3]),16) == 0x09): #\
                 #or (int(binascii.hexlify(self.inputBuf[3]),16) == 0x1c) :
-                    print "error msg: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:])
-            else:
-                print "------------------------------------------------------------------------"
-                print "error msg: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:])
-                print "------------------------------------------------------------------------"
+#                    print "error msg: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:])
+#            else:
+#                print "------------------------------------------------------------------------"
+#                print "error msg: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:])
+#                print "------------------------------------------------------------------------"
         elif self.inputBuf[1] == 'S':
             #Sending commands to mote
             #Here I am using global variables
@@ -487,7 +501,7 @@ if __name__=="__main__":
                     outputBufLock = True
                     outputBuf += [str(command_inject_udp_packet)+str_lowpanbytes+str(chsum)]
                     outputBufLock  = False
-                time.sleep(0.4)
+                time.sleep(0.2)
     except KeyboardInterrupt:
         #socketThread_object.close()
         moteProbe_object.close()
