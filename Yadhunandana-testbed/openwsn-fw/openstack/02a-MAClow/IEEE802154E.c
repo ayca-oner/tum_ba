@@ -205,7 +205,7 @@ PORT_TIMER_WIDTH ieee154e_asnDiff(asn_t* someASN) {
 	ENABLE_INTERRUPTS();
 	return diff;
 }
-// Added by Ayca, to print out the ASN Difference without harming 
+// Added by Ayca, to print out the ASN Difference without harming return contents
 PORT_TIMER_WIDTH ieee154e_asnDiff_toEvaluateLatency(asn_t* someASN) {
 	PORT_TIMER_WIDTH diff;
 	INTERRUPT_DECLARATION();
@@ -218,10 +218,19 @@ PORT_TIMER_WIDTH ieee154e_asnDiff_toEvaluateLatency(asn_t* someASN) {
 
 	diff = 0;
 	if (ieee154e_vars.asn.bytes2and3 == someASN->bytes2and3) {
-		uint8_t c,d;
-		d=ieee154e_vars.asn.bytes0and1 - someASN->bytes0and1;
-		openserial_printf(&d, 1,'C' ); //ayca - print asn diff
-		openserial_printf("55555", strlen("11111"),'A' ); //ayca - debug
+
+		uint32_t a,d,e,f,g,m;
+		m=ieee154e_vars.asn.bytes0and1 - someASN->bytes0and1;
+
+		//memcpy(&a, &ieee154e_vars.asn.bytes0and1, sizeof(asn_t));
+		//openserial_printf(&ieee154e_vars.asn.bytes0and1, 2,'F' );
+		//openserial_printf(&a, 2,'F' );
+
+		//memcpy(&e, &someASN->bytes0and1, sizeof(asn_t));
+		//openserial_printf(&e, 2,'F' );
+
+		openserial_printf(&m, 3,'C' ); //ayca - print asn diff
+
 		ENABLE_INTERRUPTS();
 		return ieee154e_vars.asn.bytes0and1 - someASN->bytes0and1;
 	}
@@ -1123,19 +1132,17 @@ port_INLINE void activity_ti1ORri1() {
 			if (idmanager_getIsDAGroot() == FALSE)
 			{
 			//aycaa; datatosend'in asn'i ile karsilastir!!!
-			openserial_printf("8888", strlen("1111"), 'A'); //-ayca debug output regularly
-			//openserial_printf(&ieee154e_vars.asn.bytes0and1, 2, 'F');
-			//openserial_printf(&ieee154e_vars.asn.bytes2and3, 2, 'F');
-			//openserial_printf(&ieee154e_vars.asn.byte4, 1, 'F');
-			//uint8_t array[5];
-			//ieee154e_getAsn(array);
-			//openserial_printf(array, 5, 'F');
+			//openserial_printf("8888", strlen("1111"), 'A'); //-ayca debug output regularly
+
 			openserial_printf(&ieee154e_vars.asn, 5,'F' );
-			//openserial_printf(&ieee154e_vars.dataReceived->l2_asn, 5,'G' ); //ayca - 110:110:110:0:0 cok farkli bir seyler cikiyor
-			openserial_printf(&ieee154e_vars.dataToSend->l2_asn, 5,'H' );
+			
+			openserial_printf(&ieee154e_vars.dataToSend->l2_asn, 5,'H' ); //ayca dogru olan
+
 			openserial_printf(&ieee154e_vars.dataToSend->priority, 1, 'G');
+
 			ieee154e_asnDiff_toEvaluateLatency(&ieee154e_vars.dataToSend->l2_asn); //-ayca
-			openserial_printf("2222", strlen("1111"), 'A'); //-ayca debug output regularly
+
+			//openserial_printf("2222", strlen("1111"), 'A'); //-ayca debug output regularly
 			}
 			
 			//Sending in INIT slot
@@ -1275,13 +1282,6 @@ port_INLINE void activity_ti1ORri1() {
 				}
 
 				else {
-					if (idmanager_getIsDAGroot() == FALSE)
-					{
-					//aycaa; datatosend'in asn'i ile karsilastir!!!
-					openserial_printf("9999", strlen("1111"), 'A'); //ayca, burdan output yok
-					ieee154e_asnDiff_toEvaluateLatency(&ieee154e_vars.dataReceived->l2_asn); //ayca
-					}
-
 					// change state
 					changeState(S_TXDATAOFFSET);
 					// change owner
@@ -1424,14 +1424,7 @@ port_INLINE void activity_ti1ORri1() {
 				changeToRX = TRUE;
 			}
 		}
-		else {
-			if (idmanager_getIsDAGroot() == FALSE)
-			{
-			//aycaa; datatosend'in asn'i ile karsilastir!!!
-			openserial_printf("7777", strlen("1111"), 'A'); //-ayca debug
-			ieee154e_asnDiff_toEvaluateLatency(&ieee154e_vars.dataReceived->l2_asn); //-ayca
-			}
-			
+		else {			
 			// change state
 			changeState(S_TXDATAOFFSET);
 			// change owner

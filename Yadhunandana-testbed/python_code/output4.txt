@@ -1,11 +1,7 @@
 
 
 Script started on 2018-09-14 14:55:10+0200
-]0;ayca@ayca-Lenovo-G510: ~/git/tum_ba/Yadhunandana-testbed/python_code[01;32mayca@ayca-Lenovo-G510[00m:[01;34m~/git/tum_ba/Yadhunandana-testbed/python_code[00m$ exitcd ../python_c
-code/[A
-]0;ayca@ayca-Lenovo-G510: ~/git/tum_ba/Yadhunandana-testbed/python_code[01;32mayca@ayca-Lenovo-G510[00m:[01;34m~/git/tum_ba/Yadhunandana-testbed/python_code[00m$ sudo scons board=z1 toolchain=mspgcc bootload=/dev/ttyUSB2 oos_openwsn[A
-]0;ayca@ayca-Lenovo-G510: ~/git/tum_ba/Yadhunandana-testbed/python_code[01;32mayca@ayca-Lenovo-G510[00m:[01;34m~/git/tum_ba/Yadhunandana-testbed/python_code[00m$ cd ../openwsn-fw[K[A
-]0;ayca@ayca-Lenovo-G510: ~/git/tum_ba/Yadhunandana-testbed/python_code[01;32mayca@ayca-Lenovo-G510[00m:[01;34m~/git/tum_ba/Yadhunandana-testbed/python_code[00m$ python serial_comm_mote1.py 
+
 serial thread: moteProbe@/dev/ttyUSB1 started successfully
   ipv6 to inject one packet
   sch to get mote schedule

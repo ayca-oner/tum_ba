@@ -197,13 +197,17 @@ class moteProbe(threading.Thread):
             # added by Ayca to print out direct numbers
 
 	elif self.inputBuf[1] == 'H':
-            print "Old ASN? : "+":".join(format(ord(c)) for c in self.inputBuf[2:])
+            print "Old ASN : "+":".join(format(ord(c)) for c in self.inputBuf[2:])
             # added by Ayca to print out direct numbers 
  
 
 	elif self.inputBuf[1] == 'G':
             print "Priority of dataToSend  : "+":".join(format(ord(c)) for c in self.inputBuf[2:])
             # added by Ayca to print out direct numbers 
+
+	elif self.inputBuf[1] == 'Z':
+            print "ESKILER : "+":".join(format(ord(c)) for c in self.inputBuf[2:])
+            # added by Ayca to print out direct numbers
 
 
 
@@ -486,7 +490,7 @@ if __name__=="__main__":
                     #a, addr = socket_handler.recvfrom(1024)
                 #except socket.timeout:
                     #print "timeout exception"
-                    #continue
+                    #continuer
                 #except KeyboardInterrupt:
                     #moteProbe_object.close()
                     #exit()
@@ -501,7 +505,7 @@ if __name__=="__main__":
                     outputBufLock = True
                     outputBuf += [str(command_inject_udp_packet)+str_lowpanbytes+str(chsum)]
                     outputBufLock  = False
-                time.sleep(0.2)
+                time.sleep(0.225)
     except KeyboardInterrupt:
         #socketThread_object.close()
         moteProbe_object.close()

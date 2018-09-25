@@ -39,7 +39,7 @@ static const uint8_t ebIEsBytestream[] = {
 
 #define NUM_CHANNELS                16 // number of channels to channel hop on
 #define SYNCHRONIZING_CHANNEL       26 // channel the mote listens on to synchronize (physical channel)
-#define TXRETRIES                    3 // number of MAC retries before declaring failed -> changed by Nico to 1 as in sixtop 1 will be added and so we have two-only sent in one frame
+#define TXRETRIES                    0 // number of MAC retries before declaring failed -> changed by Nico to 1 as in sixtop 1 will be added and so we have two-only sent in one frame
 #define TX_POWER                    31 // 1=-25dBm, 31=0dBm (max value)
 #define RESYNCHRONIZATIONGUARD       5 // in 32kHz ticks. min distance to the end of the slot to successfully synchronize
 #define US_PER_TICK                 30 // number of us per 32kHz clock tick

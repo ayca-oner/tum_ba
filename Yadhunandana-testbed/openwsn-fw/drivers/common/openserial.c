@@ -694,17 +694,24 @@ uint8_t inject_udp_packet()
     //pkt = openqueue_getFreePacketBuffer(COMPONENT_OPENSERIAL); //the original function used here
 
     uint8_t a = openrandom_get16b();  // Added by Ayca to generate random number 
-    uint8_t b= a&1;  // generate a "0" or "1"
+    uint8_t b= a&1;  // now generate 0,1,2 -------to generate a "0" or "1" = a&1
 
     if (b==0)
     {
         pkt = openqueue_getFreePacketBuffer_withpriority(COMPONENT_OPENSERIAL,1);
+        //asn_t currentasn = ieee154e_getASN();// ayca, denemee
+        //memcpy(&pkt->l2_asn, &currentasn, sizeof(asn_t)); // ayca denemee 
+
     }
-    else if (b==1)   
+    else if (b==1 )  
     {
         pkt = openqueue_getFreePacketBuffer_withpriority(COMPONENT_OPENSERIAL,8);
+        //asn_t currentasn = ieee154e_getASN();// ayca, denemee
+        //memcpy(&pkt->l2_asn, &currentasn, sizeof(asn_t)); // ayca denemee 
     }
-
+/*    else{
+        pkt = openqueue_getFreePacketBuffer_withpriority(COMPONENT_OPENSERIAL,1);
+    }*/
 
     if (pkt == NULL) {
         openserial_printError(COMPONENT_OPENSERIAL,ERR_NO_FREE_PACKET_BUFFER,

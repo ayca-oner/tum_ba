@@ -68,6 +68,7 @@ get a new packet buffer to start creating a new packet.
 OpenQueueEntry_t* openqueue_getFreePacketBuffer(uint8_t creator) {
    uint8_t i;
    uint8_t l;
+   OpenQueueEntry_t* toDelete;
    INTERRUPT_DECLARATION();
    DISABLE_INTERRUPTS();
 
@@ -83,12 +84,27 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer(uint8_t creator) {
        ENABLE_INTERRUPTS();
        return NULL;
     }
+
+    if (openqueue_vars.queue[0].owner==COMPONENT_NULL && openqueue_vars.queue[0].owner!=COMPONENT_NULL){
+          //OpenQueueEntry_t temp;  // not sure about this part
+          //temp=openqueue_vars.queue[i];
+          for (i=0;i<QUEUELENGTH;i++) {
+            openqueue_vars.queue[i]=openqueue_vars.queue[i+1];
+          }
+          //openqueue_vars.queue[9]=temp; // till here
+          toDelete = &openqueue_vars.queue[9];
+          openqueue_reset_entry(toDelete);
+    }
+
     // walk through queue and find free entry
     for (i=0;i<QUEUELENGTH;i++) {
        if (openqueue_vars.queue[i].owner==COMPONENT_NULL) {
           openqueue_vars.queue[i].creator=creator;
           openqueue_vars.queue[i].owner=COMPONENT_OPENQUEUE;   
           openqueue_vars.queue[i].priority=4;
+         // OpenQueueEntry_t* pkt; //deneme
+          //pkt=&openqueue_vars.queue[i]; //deneme
+          //openqueue_addasn(pkt); //-ayca denemee
           openqueue_sortpriority();    
           ENABLE_INTERRUPTS(); 
           return &openqueue_vars.queue[i];
@@ -101,11 +117,18 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer(uint8_t creator) {
     return NULL;
 }
 
+/*owerror_t openqueue_addasn(OpenQueueEntry_t* pkt){ //-- ayca denemeee
+          asn_t currentasn = ieee154e_getASN();
+          openserial_printf("11111", 5,'H' );
+          memcpy(&pkt->l2_asn, &currentasn, sizeof(asn_t));
+    }*/
+
 void openqueue_sortpriority(){
     uint8_t b, j, k, l, c, a, temp;
     INTERRUPT_DECLARATION();
     DISABLE_INTERRUPTS();
 
+//=====================================heap sort/ascending order===========================================
      for (b = 1; b < QUEUELENGTH; b++){
         c = b;
         do{
@@ -143,7 +166,7 @@ void openqueue_sortpriority(){
         } while (c < j);
     } 
 
-    b = QUEUELENGTH - 1;
+    b = QUEUELENGTH - 1;  // start of reversing queue
     j = 0;
     while(b > j)
     {
@@ -153,6 +176,7 @@ void openqueue_sortpriority(){
         b--;
         j++;
   }
+//====================================heap sort until here========================================================  
 
       int i = 0, len = 0, count = 10;
       char string[64] = { 0 };   
@@ -177,6 +201,7 @@ void openqueue_sortpriority(){
 OpenQueueEntry_t* openqueue_getFreePacketBuffer_withpriority(uint8_t creator, uint8_t priority ) {
     uint8_t i;
     uint8_t l;
+    OpenQueueEntry_t* toDelete;
     INTERRUPT_DECLARATION();
     DISABLE_INTERRUPTS();
     
@@ -195,7 +220,23 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer_withpriority(uint8_t creator, ui
         ENABLE_INTERRUPTS();
         return NULL;
     }
+
+  if (openqueue_vars.queue[0].owner==COMPONENT_NULL && openqueue_vars.queue[0].owner!=COMPONENT_NULL){
+          //OpenQueueEntry_t temp;  // not sure about this part
+          //temp=openqueue_vars.queue[i];
+          for (i=0;i<QUEUELENGTH;i++) {
+            openqueue_vars.queue[i]=openqueue_vars.queue[i+1];
+          }
+          //openqueue_vars.queue[9]=temp; // till here
+          toDelete = &openqueue_vars.queue[9];               
+          openqueue_reset_entry(toDelete);
+    }
     
+/*    for (i=0;i<QUEUELENGTH;i++) {
+            openserial_printf(&openqueue_vars.queue[i].l2_asn, 5,'Z' );  
+    }*/
+
+
     // walk through queue and find free entry
     for (i=0;i<QUEUELENGTH;i++) {
         if (openqueue_vars.queue[i].owner==COMPONENT_NULL) {
@@ -205,8 +246,32 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer_withpriority(uint8_t creator, ui
             openqueue_sortpriority();
             ENABLE_INTERRUPTS();
             return &openqueue_vars.queue[i];
-        }
+        }       
     }
+    if (priority==8){          
+        for (l=0;l<QUEUELENGTH;l++) {
+            if (openqueue_vars.queue[l].priority==1) {
+                toDelete = &openqueue_vars.queue[l];               
+                openqueue_reset_entry(toDelete);              
+                openqueue_vars.queue[l].creator=creator;
+                openqueue_vars.queue[l].owner=COMPONENT_OPENQUEUE;
+                openqueue_vars.queue[l].priority=priority;
+                openqueue_sortpriority();
+                ENABLE_INTERRUPTS();
+                return &openqueue_vars.queue[l];
+              }
+              else if (openqueue_vars.queue[l].priority==4) {
+                toDelete = &openqueue_vars.queue[l];               
+                openqueue_reset_entry(toDelete);              
+                openqueue_vars.queue[l].creator=creator;
+                openqueue_vars.queue[l].owner=COMPONENT_OPENQUEUE;
+                openqueue_vars.queue[l].priority=priority;
+                openqueue_sortpriority();
+                ENABLE_INTERRUPTS();
+                return &openqueue_vars.queue[l];
+              }
+          }
+        }
 
 	openqueue_sortpriority();
 
