@@ -199,6 +199,11 @@ class moteProbe(threading.Thread):
             print "Priority of dataToSend  : "+":".join(format(ord(c)) for c in self.inputBuf[2:])
             # added by Ayca to print out direct numbers 
 
+	elif self.inputBuf[1] == 'Z':
+            print "ESKILER : "+":".join(format(ord(c)) for c in self.inputBuf[2:])
+            # added by Ayca to print out direct numbers
+
+
 
         elif self.inputBuf[1] == 'R':
             print "command response: "+":".join("{:02x}".format(ord(c)) for c in self.inputBuf[2:])
@@ -494,7 +499,7 @@ if __name__=="__main__":
                     outputBufLock = True
                     outputBuf += [str(command_inject_udp_packet)+str_lowpanbytes+str(chsum)]
                     outputBufLock  = False
-                time.sleep(0.2)
+                time.sleep(0.18)
     except KeyboardInterrupt:
         #socketThread_object.close()
         moteProbe_object.close()

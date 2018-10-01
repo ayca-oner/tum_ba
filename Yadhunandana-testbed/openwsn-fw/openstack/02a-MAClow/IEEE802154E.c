@@ -229,7 +229,7 @@ PORT_TIMER_WIDTH ieee154e_asnDiff_toEvaluateLatency(asn_t* someASN) {
 		//memcpy(&e, &someASN->bytes0and1, sizeof(asn_t));
 		//openserial_printf(&e, 2,'F' );
 
-		openserial_printf(&m, 3,'C' ); //ayca - print asn diff
+		openserial_printf(&m, 2,'C' ); //ayca - print asn diff
 
 		ENABLE_INTERRUPTS();
 		return ieee154e_vars.asn.bytes0and1 - someASN->bytes0and1;
@@ -1133,14 +1133,20 @@ port_INLINE void activity_ti1ORri1() {
 			{
 			//aycaa; datatosend'in asn'i ile karsilastir!!!
 			//openserial_printf("8888", strlen("1111"), 'A'); //-ayca debug output regularly
+			print_PriorityofQueue();
 
 			openserial_printf(&ieee154e_vars.asn, 5,'F' );
+			//openserial_printf(&ieee154e_vars.asn.byte4, 1,'F' );
+			//openserial_printf(&ieee154e_vars.asn.bytes2and3, 1,'F' );
+			//openserial_printf(&ieee154e_vars.asn.bytes0and1, 1,'F' );
 			
 			openserial_printf(&ieee154e_vars.dataToSend->l2_asn, 5,'H' ); //ayca dogru olan
 
 			openserial_printf(&ieee154e_vars.dataToSend->priority, 1, 'G');
 
 			ieee154e_asnDiff_toEvaluateLatency(&ieee154e_vars.dataToSend->l2_asn); //-ayca
+
+			print_ASNofQueue();
 
 			//openserial_printf("2222", strlen("1111"), 'A'); //-ayca debug output regularly
 			}

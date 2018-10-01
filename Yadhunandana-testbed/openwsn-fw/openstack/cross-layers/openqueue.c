@@ -84,17 +84,23 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer(uint8_t creator) {
        ENABLE_INTERRUPTS();
        return NULL;
     }
+/*    uint8_t m=0;
+    for (i=0;i<QUEUELENGTH;i++){ 
+      if (openqueue_vars.queue[i].owner!=COMPONENT_NULL){
+          m++ ;  
+      }
+  } 
 
     if (openqueue_vars.queue[0].owner==COMPONENT_NULL && openqueue_vars.queue[0].owner!=COMPONENT_NULL){
           //OpenQueueEntry_t temp;  // not sure about this part
           //temp=openqueue_vars.queue[i];
-          for (i=0;i<QUEUELENGTH;i++) {
+          for (i=0;i<m+1;i++) {
             openqueue_vars.queue[i]=openqueue_vars.queue[i+1];
           }
-          //openqueue_vars.queue[9]=temp; // till here
           toDelete = &openqueue_vars.queue[9];
           openqueue_reset_entry(toDelete);
-    }
+          
+    }*/
 
     // walk through queue and find free entry
     for (i=0;i<QUEUELENGTH;i++) {
@@ -117,26 +123,46 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer(uint8_t creator) {
     return NULL;
 }
 
-/*owerror_t openqueue_addasn(OpenQueueEntry_t* pkt){ //-- ayca denemeee
+
+owerror_t openqueue_addasn(OpenQueueEntry_t* pkt){ //-- ayca denemeee
           asn_t currentasn = ieee154e_getASN();
-          openserial_printf("11111", 5,'H' );
+          //openserial_printf("11111", 5,'A' );
           memcpy(&pkt->l2_asn, &currentasn, sizeof(asn_t));
-    }*/
+    }
+
+void print_ASNofQueue(){
+  uint8_t i;
+  uint8_t m=0;
+  for (i=0;i<QUEUELENGTH;i++){ 
+      if (openqueue_vars.queue[i].owner!=COMPONENT_NULL){
+          m++ ;  
+      }
+  } 
+  // m+1 because if a packet leaves buffer and a new one does not enter, it prints out the the number of
+  // openqueue_vars.queue[i].owner!=COMPONENT_NULL and does not print last member
+  // the empty packet place has the ASN number the delivered packet had 
+    for (i=0;i<m+1;i++) {
+            openserial_printf(&openqueue_vars.queue[i].l2_asn, 5,'Z' );  
+    }
+}
+
 
 void openqueue_sortpriority(){
-    uint8_t b, j, k, l, c, a, temp;
+    uint8_t b, j, k=0, l, c, a; 
+    OpenQueueEntry_t temp;
+    OpenQueueEntry_t* toDelete;
     INTERRUPT_DECLARATION();
     DISABLE_INTERRUPTS();
 
 //=====================================heap sort/ascending order===========================================
-     for (b = 1; b < QUEUELENGTH; b++){
+/*     for (b = 1; b < QUEUELENGTH; b++){
         c = b;
         do{
             a = (c - 1) / 2;
             if (openqueue_vars.queue[a].priority < openqueue_vars.queue[c].priority){
-                temp = openqueue_vars.queue[a].priority;
-                openqueue_vars.queue[a].priority = openqueue_vars.queue[c].priority;
-                openqueue_vars.queue[c].priority = temp;
+                temp = openqueue_vars.queue[a];
+                openqueue_vars.queue[a] = openqueue_vars.queue[c];
+                openqueue_vars.queue[c] = temp;
             }
             c = a;
         } while (c != 0);
@@ -147,9 +173,9 @@ void openqueue_sortpriority(){
     for (k = 0; k < QUEUELENGTH; k++)
     {
         j= QUEUELENGTH-1-k;
-        temp = openqueue_vars.queue[0].priority;
-        openqueue_vars.queue[0].priority = openqueue_vars.queue[j].priority;    // swap max element with rightmost leaf element 
-        openqueue_vars.queue[j].priority = temp;
+        temp = openqueue_vars.queue[0];
+        openqueue_vars.queue[0] = openqueue_vars.queue[j];    // swap max element with rightmost leaf element 
+        openqueue_vars.queue[j] = temp;
         a = 0;
         do
         {
@@ -158,15 +184,15 @@ void openqueue_sortpriority(){
                 c++;
             if (openqueue_vars.queue[a].priority<openqueue_vars.queue[c].priority && c<j)    // again rearrange to max heap array 
             {
-                temp = openqueue_vars.queue[a].priority;
-                openqueue_vars.queue[a].priority = openqueue_vars.queue[c].priority;
-                openqueue_vars.queue[c].priority = temp;
+                temp = openqueue_vars.queue[a];
+                openqueue_vars.queue[a] = openqueue_vars.queue[c];
+                openqueue_vars.queue[c] = temp;
             }
             a = c;
         } while (c < j);
-    } 
+    } */
 
-    b = QUEUELENGTH - 1;  // start of reversing queue
+/*    b = QUEUELENGTH - 1;  // start of reversing queue
     j = 0;
     while(b > j)
     {
@@ -175,9 +201,32 @@ void openqueue_sortpriority(){
         openqueue_vars.queue[j].priority = temp;
         b--;
         j++;
-  }
+  }*/
 //====================================heap sort until here========================================================  
+/*        uint8_t i;
+        for (i=0;i<QUEUELENGTH;i++) {
+      if(openqueue_vars.queue[i].owner!=COMPONENT_NULL){
+        k++;
+      }
+    }  
 
+       for (b = 1; b < k; b++){  //insertion sort --> sensor crashes
+          a = openqueue_vars.queue[b].priority;
+          temp= openqueue_vars.queue[b];
+          c = b-1;
+          while (c >= 0 && openqueue_vars.queue[c].priority < a){
+              openqueue_vars.queue[c+1] = openqueue_vars.queue[c];
+              c = c-1;
+          }
+          openqueue_vars.queue[c+1] = temp;
+        }*/
+
+
+    ENABLE_INTERRUPTS();
+    //    return NULL;
+}
+
+void print_PriorityofQueue(){
       int i = 0, len = 0, count = 10;
       char string[64] = { 0 };   
 
@@ -187,10 +236,8 @@ void openqueue_sortpriority(){
       }
 
       openserial_printf(string,30,'B');
-
-    ENABLE_INTERRUPTS();
-    //    return NULL;
 }
+
 //from here the heap sort is complete, the queue is ordered from the smallest number to the highest
 // 1st priority = 1 , 2nd priority = 2 , ...and so on
 //after the first for it is not correctly sorted from high-to-low or low-to-high
@@ -221,7 +268,7 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer_withpriority(uint8_t creator, ui
         return NULL;
     }
 
-  if (openqueue_vars.queue[0].owner==COMPONENT_NULL && openqueue_vars.queue[0].owner!=COMPONENT_NULL){
+/*  if (openqueue_vars.queue[0].owner==COMPONENT_NULL && openqueue_vars.queue[0].owner!=COMPONENT_NULL){
           //OpenQueueEntry_t temp;  // not sure about this part
           //temp=openqueue_vars.queue[i];
           for (i=0;i<QUEUELENGTH;i++) {
@@ -230,7 +277,7 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer_withpriority(uint8_t creator, ui
           //openqueue_vars.queue[9]=temp; // till here
           toDelete = &openqueue_vars.queue[9];               
           openqueue_reset_entry(toDelete);
-    }
+    }*/
     
 /*    for (i=0;i<QUEUELENGTH;i++) {
             openserial_printf(&openqueue_vars.queue[i].l2_asn, 5,'Z' );  
@@ -248,9 +295,9 @@ OpenQueueEntry_t* openqueue_getFreePacketBuffer_withpriority(uint8_t creator, ui
             return &openqueue_vars.queue[i];
         }       
     }
-    if (priority==8){          
+    if (priority==1){          
         for (l=0;l<QUEUELENGTH;l++) {
-            if (openqueue_vars.queue[l].priority==1) {
+            if (openqueue_vars.queue[l].priority==8) {
                 toDelete = &openqueue_vars.queue[l];               
                 openqueue_reset_entry(toDelete);              
                 openqueue_vars.queue[l].creator=creator;
@@ -491,6 +538,7 @@ void openqueue_reset_entry(OpenQueueEntry_t* entry) {
    entry->owner                        = COMPONENT_NULL;
    entry->payload                      = &(entry->packet[127 - IEEE802154_SECURITY_TAG_LEN]); // Footer is longer if security is used
    entry->length                       = 0;
+   entry->priority                     = 9;
    //l4
    entry->l4_protocol                  = IANA_UNDEFINED;
    entry->l4_protocol_compressed       = FALSE;
